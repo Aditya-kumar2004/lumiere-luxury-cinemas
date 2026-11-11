@@ -1,13 +1,13 @@
 export default function SectionHeading({ eyebrow, title, subtitle, action, className = "" }) {
   return (
-    <div className={`mb-8 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 ${className}`}>
+    <div className={`mb-6 sm:mb-8 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 sm:gap-4 ${className}`}>
       <div className="min-w-0">
         {eyebrow && (
-          <p className="mb-2 text-xs font-bold tracking-[0.3em] text-primary">{eyebrow}</p>
+          <p className="mb-1.5 text-xs font-bold tracking-[0.25em] text-primary">{eyebrow}</p>
         )}
-        <h2 className="font-display text-4xl tracking-wide text-foreground sm:text-5xl">{title}</h2>
+        <h2 className="font-display text-2xl xs:text-3xl sm:text-5xl tracking-wide text-foreground">{title}</h2>
         {subtitle && (
-          <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">{subtitle}</p>
+          <p className="mt-1.5 max-w-xl text-xs sm:text-base text-muted-foreground">{subtitle}</p>
         )}
       </div>
       {action}

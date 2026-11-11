@@ -45,7 +45,7 @@ export default function MovieCarousel({ id, eyebrow, title, subtitle, items, ren
         {items.map((item, i) => (
           <div
             key={item.id}
-            className="w-[44%] shrink-0 snap-start sm:w-[30%] md:w-[23%] lg:w-[18.5%] xl:w-[15.5%]"
+            className="w-[68%] xs:w-[46%] sm:w-[30%] md:w-[23%] lg:w-[18.5%] xl:w-[15.5%] shrink-0 snap-start"
           >
             {renderItem(item, i)}
           </div>

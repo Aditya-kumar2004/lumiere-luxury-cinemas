@@ -1,15 +1,37 @@
 const express = require("express");
 const cors = require("cors");
+const fs = require("fs");
+const path = require("path");
 require("dotenv").config();
 
 // Import database connection
 const databaseConnection = require("./db");
+
+// Import Routes
+const authRoutes = require("./authRoutes");
+const newsletterRoutes = require("./newsletterRoutes");
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Automatically create tables if they do not exist yet
+async function setupTables() {
+  try {
+    const schemaPath = path.join(__dirname, "schema.sql");
+    const schemaSql = fs.readFileSync(schemaPath, "utf8");
+    await databaseConnection.query(schemaSql);
+    console.log("✅ PostgreSQL tables (users, movies, showtimes, bookings, subscribers) are ready!");
+  } catch (err) {
+    console.error("❌ Error setting up tables:", err.message);
+  }
+}
+
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/newsletter", newsletterRoutes);
 
 // Basic test route
 app.get("/", function (req, res) {
@@ -35,6 +57,8 @@ app.get("/api/db-test", async function (req, res) {
 
 // Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, function () {
+app.listen(PORT, async function () {
   console.log("Server is running on port " + PORT);
+  // Auto-check tables on server start
+  await setupTables();
 });

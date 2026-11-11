@@ -38,13 +38,13 @@ export default function MovieDetailsPage() {
         >
           <ArrowLeft className="h-4 w-4" /> All movies
         </Link>
-        <div className="grid gap-10 md:grid-cols-[320px_1fr] lg:gap-16">
+        <div className="grid gap-8 md:grid-cols-[280px_1fr] lg:grid-cols-[320px_1fr] lg:gap-16">
           <img
             src={movie.poster}
             alt={`${movie.title} poster`}
             width={672}
             height={992}
-            className="w-full max-w-xs rounded-lg border border-border shadow-card"
+            className="mx-auto md:mx-0 w-full max-w-[260px] xs:max-w-xs rounded-lg border border-border shadow-card"
           />
           <div className="min-w-0">
             <div className="flex flex-wrap gap-2">
@@ -62,7 +62,7 @@ export default function MovieDetailsPage() {
                 </span>
               )}
             </div>
-            <h1 className="mt-4 font-display-tight text-6xl sm:text-8xl">{movie.title}</h1>
+            <h1 className="mt-4 font-display-tight text-3xl xs:text-4xl sm:text-7xl lg:text-8xl">{movie.title}</h1>
             <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
               <Rating value={movie.rating} className="text-base" />
               {movie.duration && (
@@ -80,17 +80,17 @@ export default function MovieDetailsPage() {
                 {movie.releaseDate || movie.year}
               </span>
             </div>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
+            <p className="mt-5 text-base sm:text-lg leading-relaxed text-muted-foreground">
               {movie.description}
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-col xs:flex-row flex-wrap gap-3">
               {soon ? (
-                <span className="btn-outline">Releasing {movie.releaseDate}</span>
+                <span className="btn-outline w-full xs:w-auto text-center">Releasing {movie.releaseDate}</span>
               ) : (
                 <Link
                   to="/book/$movieId"
                   params={{ movieId: movie.id }}
-                  className="btn-gold !px-7 !py-3.5"
+                  className="btn-gold !px-7 !py-3.5 w-full xs:w-auto text-center"
                 >
                   <Ticket className="h-4 w-4" /> Book Tickets
                 </Link>

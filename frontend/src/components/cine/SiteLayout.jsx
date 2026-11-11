@@ -7,7 +7,11 @@ export default function SiteLayout({ children }) {
   const isAuthPage = pathname === "/login" || pathname === "/register";
 
   if (isAuthPage) {
-    return <main className="h-screen w-full overflow-hidden bg-background">{children}</main>;
+    return (
+      <main className="min-h-screen lg:h-screen w-full overflow-y-auto lg:overflow-hidden bg-background">
+        {children}
+      </main>
+    );
   }
 
   return (

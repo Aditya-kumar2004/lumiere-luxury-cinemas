@@ -111,7 +111,7 @@ export default function HeroSection() {
             </span>
           </div>
 
-          <h1 className="font-display-tight text-[3.4rem] text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)] sm:text-7xl lg:text-[6.2rem]">
+          <h1 className="font-display-tight text-[2.4rem] xs:text-[3.1rem] text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)] sm:text-7xl lg:text-[6.2rem] leading-[1.05]">
             Experience movies
             <br />
             <span className="text-primary">like never before.</span>
@@ -136,14 +136,14 @@ export default function HeroSection() {
             ))}
           </ul>
 
-          <div className="mt-9 flex flex-wrap gap-3">
-            <Link to="/movies" className="btn-gold !px-6 !py-3.5 shadow-lg">
+          <div className="mt-9 flex flex-col xs:flex-row flex-wrap gap-3">
+            <Link to="/movies" className="btn-gold !px-6 !py-3.5 shadow-lg w-full xs:w-auto">
               Explore Movies <ArrowRight className="h-4 w-4" />
             </Link>
             <button
               type="button"
               onClick={() => setTrailer(true)}
-              className="inline-flex items-center justify-center gap-2 rounded-sm border border-white/20 bg-black/60 px-6 py-3.5 text-sm font-semibold text-white shadow-lg transition hover:border-primary hover:bg-black/80 hover:text-primary active:scale-95"
+              className="inline-flex w-full xs:w-auto items-center justify-center gap-2 rounded-sm border border-white/20 bg-black/60 px-6 py-3.5 text-sm font-semibold text-white shadow-lg transition hover:border-primary hover:bg-black/80 hover:text-primary active:scale-95"
             >
               <span className="grid h-6 w-6 place-items-center rounded-full border border-primary">
                 <Play className="h-3 w-3 translate-x-[1px] fill-primary text-primary" />

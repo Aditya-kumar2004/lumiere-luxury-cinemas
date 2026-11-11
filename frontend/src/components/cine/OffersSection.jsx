@@ -60,7 +60,7 @@ export default function OffersSection() {
               {o.tag}
             </span>
             <h3
-              className={`font-display tracking-wide text-amber-400 ${o.big ? "text-6xl sm:text-7xl" : "text-4xl"}`}
+              className={`font-display tracking-wide text-amber-400 ${o.big ? "text-4xl xs:text-5xl sm:text-7xl" : "text-3xl sm:text-4xl"}`}
             >
               {o.title}
             </h3>

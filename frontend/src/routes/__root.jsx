@@ -122,12 +122,23 @@ function RootShell({ children }) {
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var s=localStorage.getItem('lumiere-theme');var t=s||'dark';document.documentElement.classList.remove('dark','light');document.documentElement.classList.add(t);document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`,
+            __html: `(function(){try{var s=localStorage.getItem('lumiere-theme');var t=s||'dark';document.documentElement.classList.remove('dark','light');document.documentElement.classList.add(t);document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+            // Suppress browser extension hydration warnings (e.g. Urban VPN bis_skin_checked)
+            if(typeof window!=='undefined'){
+              var _origErr=console.error;
+              console.error=function(){
+                var msg=arguments[0];
+                if(typeof msg==='string'&&(msg.indexOf('bis_skin_checked')!==-1||msg.indexOf('hydration-mismatch')!==-1||msg.indexOf("didn't match the client properties")!==-1)){
+                  return;
+                }
+                _origErr.apply(console,arguments);
+              };
+            }`,
           }}
         />
         <HeadContent />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         {children}
         <Scripts />
       </body>

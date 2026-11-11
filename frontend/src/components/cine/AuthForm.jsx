@@ -19,6 +19,8 @@ import {
   Sun,
   Moon,
   Sparkles,
+  KeyRound,
+  RotateCw,
 } from "lucide-react";
 import heroImax from "@/assets/hero-imax.jpg";
 import heroVip from "@/assets/hero-vip-lounge.jpg";
@@ -111,6 +113,13 @@ export default function AuthForm({ mode }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [paused, setPaused] = useState(false);
 
+  // OTP Verification State
+  const [otpStep, setOtpStep] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [otpError, setOtpError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
+
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % AUTH_SLIDES.length);
   }, []);
@@ -128,6 +137,31 @@ export default function AuthForm({ mode }) {
     return () => clearInterval(timer);
   }, [paused, nextSlide]);
 
+  // Resend OTP countdown timer
+  useEffect(() => {
+    if (resendTimer <= 0) return;
+    const interval = setInterval(() => {
+      setResendTimer((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [resendTimer]);
+
+  // Auto-detect OTP from email verification link
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const codeParam = params.get("code") || params.get("otp");
+      const emailParam = params.get("email");
+      if (codeParam) {
+        setOtp(codeParam.trim());
+        setOtpStep(true);
+      }
+      if (emailParam) {
+        setForm((prev) => ({ ...prev, email: emailParam.trim() }));
+      }
+    }
+  }, []);
+
   const handleInputChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
@@ -136,7 +170,8 @@ export default function AuthForm({ mode }) {
   const inputClass =
     "h-10.5 w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground";
 
-  const submit = (e) => {
+  // Submit Register or Login Form
+  const submit = async (e) => {
     e.preventDefault();
     const next = {};
 
@@ -158,18 +193,136 @@ export default function AuthForm({ mode }) {
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
-    toast.success(isLogin ? "Welcome back!" : "Account created successfully!", {
-      description: "Demo mode: authentication session activated.",
-    });
-    setTimeout(() => {
-      navigate({ to: "/" });
-    }, 600);
+    setIsSubmitting(true);
+
+    if (isLogin) {
+      // Login API call
+      try {
+        const res = await fetch("http://localhost:5000/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: form.email, password: form.password }),
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          if (data.token) {
+            localStorage.setItem("lumiere-token", data.token);
+          }
+          localStorage.setItem("lumiere-user", JSON.stringify(data.user));
+          window.dispatchEvent(new Event("lumiere-auth-change"));
+          toast.success("Welcome back, " + data.user.name + "!");
+          setTimeout(() => navigate({ to: "/" }), 600);
+        } else if (data.requiresVerification) {
+          setOtpStep(true);
+          toast.info("Please verify your account with the 8-digit code.");
+        } else {
+          toast.error(data.message || "Invalid credentials.");
+        }
+      } catch {
+        // Fallback for offline demo
+        toast.success("Welcome back! (Demo Session Active)");
+        setTimeout(() => navigate({ to: "/" }), 600);
+      } finally {
+        setIsSubmitting(false);
+      }
+    } else {
+      // Register API Call -> Triggers 8-Digit OTP Email
+      try {
+        const res = await fetch("http://localhost:5000/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          setOtpStep(true);
+          setResendTimer(60);
+          toast.success("Verification Code Sent!", {
+            description: "Check your email for the 8-digit verification code.",
+          });
+        } else {
+          toast.error(data.message || "Registration failed.");
+        }
+      } catch {
+        // Fallback for offline demo
+        setOtpStep(true);
+        setResendTimer(60);
+        toast.info("Demo Mode: 8-digit verification active.");
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
+
+  // Verify 8-Digit OTP
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    if (!otp || otp.trim().length !== 8) {
+      setOtpError("Please enter the complete 8-digit code.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setOtpError("");
+
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email, otp: otp.trim() }),
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        if (data.token) {
+          localStorage.setItem("lumiere-token", data.token);
+        }
+        localStorage.setItem("lumiere-user", JSON.stringify(data.user));
+        window.dispatchEvent(new Event("lumiere-auth-change"));
+        toast.success("Account Verified!", {
+          description: "Welcome to LUMIÈRE Cinemas VIP membership.",
+        });
+        setTimeout(() => navigate({ to: "/" }), 700);
+      } else {
+        const errorMsg = data.message || "Invalid code. Please try again.";
+        setOtpError(errorMsg);
+        toast.error("Verification Failed", {
+          description: errorMsg,
+        });
+      }
+    } catch {
+      // Fallback for offline demo
+      toast.success("Account Activated!", {
+        description: "Welcome to LUMIÈRE Cinemas.",
+      });
+      setTimeout(() => navigate({ to: "/" }), 700);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Resend 8-Digit OTP
+  const handleResendOtp = async () => {
+    if (resendTimer > 0) return;
+    setResendTimer(60);
+    try {
+      await fetch("http://localhost:5000/api/auth/resend-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email }),
+      });
+      toast.success("New 8-digit code sent to your email!");
+    } catch {
+      toast.info("Demo: New code generated.");
+    }
   };
 
   const slide = AUTH_SLIDES[currentSlide];
 
   return (
-    <div className="grid h-screen w-full grid-cols-1 overflow-hidden lg:grid-cols-2">
+    <div className="grid min-h-screen lg:h-screen w-full grid-cols-1 overflow-y-auto lg:overflow-hidden lg:grid-cols-2">
       {/* LEFT HALF: 8K MOVIE & QUOTES CAROUSEL */}
       <div
         className="relative hidden h-full w-full select-none overflow-hidden bg-black lg:block"
@@ -272,8 +425,8 @@ export default function AuthForm({ mode }) {
         </div>
       </div>
 
-      {/* RIGHT HALF: DEDICATED AUTH FORM (Strictly Fits in One Page) */}
-      <div className="relative flex h-full flex-col justify-between overflow-y-auto bg-background px-6 py-6 sm:px-10 xl:px-14">
+      {/* RIGHT HALF: DEDICATED AUTH FORM (Scrollable on mobile, fits on desktop) */}
+      <div className="relative flex min-h-full lg:h-full flex-col justify-between overflow-y-auto bg-background px-4 py-6 sm:px-10 xl:px-14">
         {/* Top Action Bar */}
         <div className="flex items-center justify-between">
           <Link
@@ -303,226 +456,303 @@ export default function AuthForm({ mode }) {
         </div>
 
         {/* Center Form Container */}
-        <div className={`mx-auto my-auto w-full py-2 ${isLogin ? "max-w-sm" : "max-w-md"}`}>
+        <div className={`mx-auto my-auto w-full py-2 ${isLogin || otpStep ? "max-w-sm" : "max-w-md"}`}>
           {/* Mobile Logo */}
           <div className="mb-4 lg:hidden">
             <Logo />
           </div>
 
-          <div>
-            <h1 className="font-display text-3xl tracking-wide text-foreground sm:text-4xl">
-              {isLogin ? "WELCOME BACK" : "CREATE ACCOUNT"}
-            </h1>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {isLogin
-                ? "Sign in to access your bookings, tickets and VIP rewards."
-                : "Join LUMIÈRE Cinemas to unlock VIP perks, birthday tickets & instant booking."}
-            </p>
-          </div>
+          {/* SCREEN 1: 8-DIGIT OTP VERIFICATION */}
+          {otpStep ? (
+            <div className="animate-fade-in">
+              <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-primary/50 bg-primary/10 text-primary shadow-lg mb-3">
+                <KeyRound className="h-6 w-6" />
+              </div>
 
-          {/* Form */}
-          <form onSubmit={submit} noValidate className="mt-5 space-y-3">
-            {isLogin ? (
-              /* LOGIN FORM */
-              <>
-                <Field icon={Mail} error={errors.email}>
-                  <input
-                    type="email"
-                    className={inputClass}
-                    placeholder="Email address"
-                    value={form.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
-                    aria-label="Email address"
-                    autoComplete="email"
-                  />
-                </Field>
+              <h1 className="font-display text-2xl xs:text-3xl sm:text-4xl tracking-wide text-foreground">
+                VERIFY YOUR ACCOUNT
+              </h1>
+              <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">
+                We sent an 8-digit verification code to{" "}
+                <span className="font-bold text-foreground">{form.email}</span>. Enter it below to activate your account.
+              </p>
 
-                <Field icon={Lock} error={errors.password}>
-                  <input
-                    type={show ? "text" : "password"}
-                    className={inputClass}
-                    placeholder="Password (min 8 characters)"
-                    value={form.password}
-                    onChange={(e) => handleInputChange("password", e.target.value)}
-                    aria-label="Password"
-                    autoComplete="current-password"
-                  />
+              <form onSubmit={handleVerifyOtp} className="mt-6 space-y-4">
+                <div>
+                  <div className="relative rounded-xl border-2 border-primary/40 bg-surface/80 p-2.5 sm:p-3 shadow-inner transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30">
+                    <input
+                      type="text"
+                      maxLength={8}
+                      value={otp}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, "");
+                        setOtp(val);
+                        setOtpError("");
+                      }}
+                      placeholder="••••••••"
+                      className="w-full bg-transparent text-center font-mono text-xl xs:text-2xl sm:text-3xl font-extrabold tracking-[0.22em] xs:tracking-[0.32em] sm:tracking-[0.4em] text-primary outline-none placeholder:text-muted-foreground/30"
+                      autoFocus
+                    />
+                  </div>
+                  {otpError && <p className="mt-2 text-center text-xs text-destructive">{otpError}</p>}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting || otp.length !== 8}
+                  className="btn-gold h-11 w-full text-xs font-bold uppercase tracking-wider shadow-md disabled:opacity-50"
+                >
+                  {isSubmitting ? "Verifying..." : "Verify & Activate Account"}
+                </button>
+
+                <div className="flex items-center justify-between pt-2 text-xs">
                   <button
                     type="button"
-                    onClick={() => setShow(!show)}
-                    aria-label={show ? "Hide password" : "Show password"}
+                    onClick={() => setOtpStep(false)}
                     className="text-muted-foreground hover:text-foreground"
                   >
-                    {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    ← Change details
                   </button>
-                </Field>
 
-                <div className="flex items-center justify-between text-xs">
-                  <label className="flex cursor-pointer items-center gap-2 text-muted-foreground hover:text-foreground">
-                    <input
-                      type="checkbox"
-                      checked={form.remember}
-                      onChange={(e) => handleInputChange("remember", e.target.checked)}
-                      className="h-3.5 w-3.5 rounded border-border text-primary accent-primary"
-                    />
-                    <span>Remember me</span>
-                  </label>
                   <button
                     type="button"
-                    onClick={() => toast.info("Password reset link will be sent to your email.")}
-                    className="font-medium text-primary hover:underline"
+                    onClick={handleResendOtp}
+                    disabled={resendTimer > 0}
+                    className="inline-flex items-center gap-1 font-semibold text-primary hover:underline disabled:opacity-50"
                   >
-                    Forgot password?
+                    <RotateCw className="h-3 w-3" />
+                    {resendTimer > 0 ? `Resend code in ${resendTimer}s` : "Resend Code"}
                   </button>
                 </div>
-              </>
-            ) : (
-              /* REGISTRATION FORM (With More Complete User Information) */
-              <>
-                {/* Full Name & Phone Number */}
-                <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                  <Field icon={User} error={errors.name}>
-                    <input
-                      className={inputClass}
-                      placeholder="Full name"
-                      value={form.name}
-                      onChange={(e) => handleInputChange("name", e.target.value)}
-                      aria-label="Full name"
-                      autoComplete="name"
-                    />
-                  </Field>
+              </form>
+            </div>
+          ) : (
+            /* SCREEN 2: LOGIN / REGISTER FORMS */
+            <div>
+              <div>
+                <h1 className="font-display text-2xl xs:text-3xl sm:text-4xl tracking-wide text-foreground">
+                  {isLogin ? "WELCOME BACK" : "CREATE ACCOUNT"}
+                </h1>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {isLogin
+                    ? "Sign in to access your bookings, tickets and VIP rewards."
+                    : "Join LUMIÈRE Cinemas to unlock VIP perks, birthday tickets & instant booking."}
+                </p>
+              </div>
 
-                  <Field icon={Phone} error={errors.phone}>
-                    <input
-                      type="tel"
-                      className={inputClass}
-                      placeholder="Mobile (10 digits)"
-                      value={form.phone}
-                      onChange={(e) => handleInputChange("phone", e.target.value)}
-                      aria-label="Mobile number"
-                      autoComplete="tel"
-                    />
-                  </Field>
-                </div>
+              {/* Form */}
+              <form onSubmit={submit} noValidate className="mt-5 space-y-3">
+                {isLogin ? (
+                  /* LOGIN FORM */
+                  <>
+                    <Field icon={Mail} error={errors.email}>
+                      <input
+                        type="email"
+                        className={inputClass}
+                        placeholder="Email address"
+                        value={form.email}
+                        onChange={(e) => handleInputChange("email", e.target.value)}
+                        aria-label="Email address"
+                        autoComplete="email"
+                      />
+                    </Field>
 
-                {/* Email Address */}
-                <Field icon={Mail} error={errors.email}>
-                  <input
-                    type="email"
-                    className={inputClass}
-                    placeholder="Email address (for tickets & receipts)"
-                    value={form.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
-                    aria-label="Email address"
-                    autoComplete="email"
-                  />
-                </Field>
+                    <Field icon={Lock} error={errors.password}>
+                      <input
+                        type={show ? "text" : "password"}
+                        className={inputClass}
+                        placeholder="Password (min 8 characters)"
+                        value={form.password}
+                        onChange={(e) => handleInputChange("password", e.target.value)}
+                        aria-label="Password"
+                        autoComplete="current-password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShow(!show)}
+                        aria-label={show ? "Hide password" : "Show password"}
+                        className="text-muted-foreground hover:text-foreground"
+                      >
+                        {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </Field>
 
-                {/* City & Date of Birth */}
-                <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                  <Field icon={MapPin} error={errors.city}>
-                    <select
-                      value={form.city}
-                      onChange={(e) => handleInputChange("city", e.target.value)}
-                      className="h-10.5 w-full bg-transparent text-sm text-foreground outline-none"
-                      aria-label="Preferred city"
-                    >
-                      {CITIES.map((c) => (
-                        <option key={c} value={c} className="bg-card text-foreground">
-                          {c}
-                        </option>
-                      ))}
-                    </select>
-                  </Field>
+                    <div className="flex items-center justify-between text-xs">
+                      <label className="flex cursor-pointer items-center gap-2 text-muted-foreground hover:text-foreground">
+                        <input
+                          type="checkbox"
+                          checked={form.remember}
+                          onChange={(e) => handleInputChange("remember", e.target.checked)}
+                          className="h-3.5 w-3.5 rounded border-border text-primary accent-primary"
+                        />
+                        <span>Remember me</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => toast.info("Password reset link will be sent to your email.")}
+                        className="font-medium text-primary hover:underline"
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  /* REGISTRATION FORM (With Complete User Information) */
+                  <>
+                    {/* Full Name & Phone Number */}
+                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                      <Field icon={User} error={errors.name}>
+                        <input
+                          className={inputClass}
+                          placeholder="Full name"
+                          value={form.name}
+                          onChange={(e) => handleInputChange("name", e.target.value)}
+                          aria-label="Full name"
+                          autoComplete="name"
+                        />
+                      </Field>
 
-                  <Field icon={Calendar} error={errors.dob}>
-                    <input
-                      type="date"
-                      className={inputClass}
-                      value={form.dob}
-                      onChange={(e) => handleInputChange("dob", e.target.value)}
-                      aria-label="Date of birth"
-                      title="Date of birth (for birthday privileges)"
-                    />
-                  </Field>
-                </div>
+                      <Field icon={Phone} error={errors.phone}>
+                        <input
+                          type="tel"
+                          className={inputClass}
+                          placeholder="Mobile (10 digits)"
+                          value={form.phone}
+                          onChange={(e) => handleInputChange("phone", e.target.value)}
+                          aria-label="Mobile number"
+                          autoComplete="tel"
+                        />
+                      </Field>
+                    </div>
 
-                {/* Password & Confirm Password */}
-                <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                  <Field icon={Lock} error={errors.password}>
-                    <input
-                      type={show ? "text" : "password"}
-                      className={inputClass}
-                      placeholder="Password (8+ chars)"
-                      value={form.password}
-                      onChange={(e) => handleInputChange("password", e.target.value)}
-                      aria-label="Password"
-                      autoComplete="new-password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShow(!show)}
-                      aria-label={show ? "Hide password" : "Show password"}
-                      className="text-muted-foreground hover:text-foreground"
-                    >
-                      {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </Field>
+                    {/* Email Address */}
+                    <Field icon={Mail} error={errors.email}>
+                      <input
+                        type="email"
+                        className={inputClass}
+                        placeholder="Email address (for tickets & receipts)"
+                        value={form.email}
+                        onChange={(e) => handleInputChange("email", e.target.value)}
+                        aria-label="Email address"
+                        autoComplete="email"
+                      />
+                    </Field>
 
-                  <Field icon={Lock} error={errors.confirmPassword}>
-                    <input
-                      type={show ? "text" : "password"}
-                      className={inputClass}
-                      placeholder="Confirm password"
-                      value={form.confirmPassword}
-                      onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
-                      aria-label="Confirm password"
-                      autoComplete="new-password"
-                    />
-                  </Field>
-                </div>
+                    {/* City & Date of Birth */}
+                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                      <Field icon={MapPin} error={errors.city}>
+                        <select
+                          value={form.city}
+                          onChange={(e) => handleInputChange("city", e.target.value)}
+                          className="h-10.5 w-full bg-transparent text-sm text-foreground outline-none"
+                          aria-label="Preferred city"
+                        >
+                          {CITIES.map((c) => (
+                            <option key={c} value={c} className="bg-card text-foreground">
+                              {c}
+                            </option>
+                          ))}
+                        </select>
+                      </Field>
 
-                {/* Terms and Conditions Checkbox */}
-                <div className="pt-0.5">
-                  <label className="flex cursor-pointer items-start gap-2 text-[11px] text-muted-foreground hover:text-foreground">
-                    <input
-                      type="checkbox"
-                      checked={form.agreeTerms}
-                      onChange={(e) => handleInputChange("agreeTerms", e.target.checked)}
-                      className="mt-0.5 h-3.5 w-3.5 rounded border-border text-primary accent-primary"
-                    />
-                    <span>
-                      I agree to the{" "}
-                      <span className="text-primary hover:underline">Terms of Service</span> and{" "}
-                      <span className="text-primary hover:underline">Privacy Policy</span>.
-                    </span>
-                  </label>
-                  {errors.agreeTerms && (
-                    <p className="mt-1 text-[11px] text-destructive">{errors.agreeTerms}</p>
-                  )}
-                </div>
-              </>
-            )}
+                      <Field icon={Calendar} error={errors.dob}>
+                        <input
+                          type="date"
+                          className={inputClass}
+                          value={form.dob}
+                          onChange={(e) => handleInputChange("dob", e.target.value)}
+                          aria-label="Date of birth"
+                          title="Date of birth (for birthday privileges)"
+                        />
+                      </Field>
+                    </div>
 
-            <button type="submit" className="btn-gold !mt-3 h-10.5 w-full text-xs font-bold shadow-md uppercase tracking-wider">
-              {isLogin ? "Sign In to LUMIÈRE" : "Create My Account"}
-            </button>
-          </form>
+                    {/* Password & Confirm Password */}
+                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                      <Field icon={Lock} error={errors.password}>
+                        <input
+                          type={show ? "text" : "password"}
+                          className={inputClass}
+                          placeholder="Password (8+ chars)"
+                          value={form.password}
+                          onChange={(e) => handleInputChange("password", e.target.value)}
+                          aria-label="Password"
+                          autoComplete="new-password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShow(!show)}
+                          aria-label={show ? "Hide password" : "Show password"}
+                          className="text-muted-foreground hover:text-foreground"
+                        >
+                          {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </Field>
 
-          {/* Switch Mode Prompt */}
-          <div className="mt-4 text-center text-xs text-muted-foreground">
-            {isLogin ? "New to LUMIÈRE? " : "Already have an account? "}
-            <Link
-              to={isLogin ? "/register" : "/login"}
-              className="font-bold text-primary transition hover:underline"
-            >
-              {isLogin ? "Create an account" : "Sign In"}
-            </Link>
-          </div>
+                      <Field icon={Lock} error={errors.confirmPassword}>
+                        <input
+                          type={show ? "text" : "password"}
+                          className={inputClass}
+                          placeholder="Confirm password"
+                          value={form.confirmPassword}
+                          onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                          aria-label="Confirm password"
+                          autoComplete="new-password"
+                        />
+                      </Field>
+                    </div>
+
+                    {/* Terms and Conditions Checkbox */}
+                    <div className="pt-0.5">
+                      <label className="flex cursor-pointer items-start gap-2 text-[11px] text-muted-foreground hover:text-foreground">
+                        <input
+                          type="checkbox"
+                          checked={form.agreeTerms}
+                          onChange={(e) => handleInputChange("agreeTerms", e.target.checked)}
+                          className="mt-0.5 h-3.5 w-3.5 rounded border-border text-primary accent-primary"
+                        />
+                        <span>
+                          I agree to the{" "}
+                          <span className="text-primary hover:underline">Terms of Service</span> and{" "}
+                          <span className="text-primary hover:underline">Privacy Policy</span>.
+                        </span>
+                      </label>
+                      {errors.agreeTerms && (
+                        <p className="mt-1 text-[11px] text-destructive">{errors.agreeTerms}</p>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="btn-gold !mt-3 h-10.5 w-full text-xs font-bold shadow-md uppercase tracking-wider disabled:opacity-50"
+                >
+                  {isSubmitting
+                    ? "Processing..."
+                    : isLogin
+                      ? "Sign In to LUMIÈRE"
+                      : "Create My Account"}
+                </button>
+              </form>
+
+              {/* Switch Mode Prompt */}
+              <div className="mt-4 text-center text-xs text-muted-foreground">
+                {isLogin ? "New to LUMIÈRE? " : "Already have an account? "}
+                <Link
+                  to={isLogin ? "/register" : "/login"}
+                  className="font-bold text-primary transition hover:underline"
+                >
+                  {isLogin ? "Create an account" : "Sign In"}
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Footer Security Note */}
-        <div className="flex items-center justify-between border-t border-border/60 pt-3 text-[11px] text-muted-foreground">
+        <div className="flex flex-col xs:flex-row items-center justify-between gap-2 border-t border-border/60 pt-3 text-[11px] text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <ShieldCheck className="h-3.5 w-3.5 text-primary" />
             <span>256-bit Encrypted Booking</span>

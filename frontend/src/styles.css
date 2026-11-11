@@ -278,3 +278,77 @@
     scroll-behavior: auto;
   }
 }
+
+/* ========================================================
+   TOAST NOTIFICATION STYLING (Green for Success, Red for Error)
+   ======================================================== */
+[data-sonner-toaster] [data-sonner-toast] {
+  font-family: var(--font-sans) !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* 1. SUCCESS TOAST: Bright Vibrant Emerald Green */
+[data-sonner-toaster] [data-sonner-toast][data-type="success"] {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid #10b981 !important;
+}
+[data-sonner-toaster] [data-sonner-toast][data-type="success"] [data-icon] {
+  color: #ffffff !important;
+}
+[data-sonner-toaster] [data-sonner-toast][data-type="success"] [data-title] {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+[data-sonner-toaster] [data-sonner-toast][data-type="success"] [data-description] {
+  color: #ecfdf5 !important;
+  font-weight: 400 !important;
+}
+[data-sonner-toaster] [data-sonner-toast][data-type="success"] [data-close-button] {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+/* 2. ERROR TOAST: Bright Vibrant Crimson Red */
+[data-sonner-toaster] [data-sonner-toast][data-type="error"] {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid #ef4444 !important;
+}
+[data-sonner-toaster] [data-sonner-toast][data-type="error"] [data-icon] {
+  color: #ffffff !important;
+}
+[data-sonner-toaster] [data-sonner-toast][data-type="error"] [data-title] {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+[data-sonner-toaster] [data-sonner-toast][data-type="error"] [data-description] {
+  color: #fff1f2 !important;
+  font-weight: 400 !important;
+}
+[data-sonner-toaster] [data-sonner-toast][data-type="error"] [data-close-button] {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+/* 3. INFO TOAST: LUMIÈRE Signature Gold */
+[data-sonner-toaster] [data-sonner-toast][data-type="info"] {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid #f59e0b !important;
+}
+[data-sonner-toaster] [data-sonner-toast][data-type="info"] [data-icon] {
+  color: #ffffff !important;
+}
+[data-sonner-toaster] [data-sonner-toast][data-type="info"] [data-title] {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+[data-sonner-toaster] [data-sonner-toast][data-type="info"] [data-description] {
+  color: #fef3c7 !important;
+}
+

@@ -60,8 +60,8 @@ export default function BookingPage() {
                 className="h-24 w-16 shrink-0 rounded-sm object-cover"
               />
               <div className="min-w-0">
-                <h1 className="truncate font-display text-5xl tracking-wide">{movie.title}</h1>
-                <p className="text-sm text-muted-foreground">
+                <h1 className="truncate font-display text-2xl xs:text-3xl sm:text-5xl tracking-wide">{movie.title}</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   {movie.genres.join(" • ")} · {movie.duration} · {movie.language}
                 </p>
               </div>
@@ -100,8 +100,11 @@ export default function BookingPage() {
             </div>
             <div className="rounded-lg border border-border bg-surface p-4 sm:p-8">
               <div className="mx-auto mb-10 h-2 w-3/4 rounded-full bg-primary/60 shadow-gold" />
-              <p className="-mt-8 mb-8 text-center text-[10px] tracking-[0.4em] text-muted-foreground">
+              <p className="-mt-8 mb-4 text-center text-[10px] tracking-[0.4em] text-muted-foreground">
                 SCREEN
+              </p>
+              <p className="mb-4 text-center text-[11px] text-primary/80 sm:hidden">
+                ↔ Swipe horizontally to view all 12 seats
               </p>
               <div className="no-scrollbar overflow-x-auto">
                 <div className="mx-auto w-fit space-y-2">

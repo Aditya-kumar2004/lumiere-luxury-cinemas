@@ -16,15 +16,15 @@ export default function FeatureStrip() {
         {ITEMS.map(({ icon: Icon, title, text }) => (
           <div
             key={title}
-            className="group flex items-center gap-3 bg-surface/95 p-4 backdrop-blur transition hover:bg-card sm:p-5"
+            className="group flex flex-col xs:flex-row items-start xs:items-center gap-2 xs:gap-3 bg-surface/95 p-3 xs:p-4 sm:p-5 backdrop-blur transition hover:bg-card"
           >
             <Icon
-              className="h-7 w-7 shrink-0 text-primary transition-transform group-hover:scale-110"
+              className="h-6 w-6 xs:h-7 xs:w-7 shrink-0 text-primary transition-transform group-hover:scale-110"
               strokeWidth={1.5}
             />
             <div className="min-w-0">
-              <p className="truncate text-sm font-bold text-foreground">{title}</p>
-              <p className="text-xs text-muted-foreground">{text}</p>
+              <p className="truncate text-xs xs:text-sm font-bold text-foreground">{title}</p>
+              <p className="text-[11px] xs:text-xs text-muted-foreground line-clamp-1 xs:line-clamp-none">{text}</p>
             </div>
           </div>
         ))}
