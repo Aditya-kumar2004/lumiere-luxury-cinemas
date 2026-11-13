@@ -3,7 +3,6 @@
 import ironDominion from "@/assets/posters/iron-dominion.jpg";
 import eventHorizon from "@/assets/posters/event-horizon.jpg";
 import lostKingdom from "@/assets/posters/lost-kingdom.jpg";
-import skyPals from "@/assets/posters/sky-pals.jpg";
 import hollowHouse from "@/assets/posters/hollow-house.jpg";
 import roadTripped from "@/assets/posters/road-tripped.jpg";
 import lastNocturne from "@/assets/posters/last-nocturne.jpg";
@@ -141,20 +140,6 @@ export const MOVIES = [
     trending: true,
     description:
       "A team of explorers chases a golden legend across collapsing bridges, hidden jungles and ancient traps.",
-  },
-  {
-    id: "sky-pals",
-    title: "Sky Pals",
-    poster: skyPals,
-    genres: ["Animation", "Comedy"],
-    duration: "1h 38m",
-    language: "English",
-    rating: 8.2,
-    age: "U",
-    year: 2026,
-    status: "now",
-    description:
-      "A fox, a robot and a nervous penguin sail a paper boat across the clouds to find their way home.",
   },
   {
     id: "the-hollow-house",

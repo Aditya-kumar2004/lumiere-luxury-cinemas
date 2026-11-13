@@ -250,6 +250,118 @@ async function sendOtpEmail(userEmail, userName, otpCode) {
   }
 }
 
+const { generateTicketPdf } = require("./ticketPdfService");
+
+// Function to send Booking Confirmation Email with PDF Ticket Attachment
+async function sendBookingEmail(booking) {
+  require("dotenv").config();
+  const user = (process.env.EMAIL_USER || "").trim();
+  const pass = (process.env.EMAIL_PASS || "").trim();
+
+  const recipientEmail = booking.user_email || booking.userEmail;
+  const bookingCode = booking.booking_code || booking.bookingCode || "CP-" + Math.floor(10000 + Math.random() * 90000);
+  const movieTitle = booking.movie_title || booking.movieTitle || "Movie";
+  const cinemaName = booking.cinema_name || booking.cinemaName || "LUMIÈRE Cinemas";
+  const rawDate = booking.show_date || booking.showDate || new Date();
+  const showDate = new Date(rawDate).toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+  const showTime = booking.show_time || booking.showTime || "7:30 PM";
+  const seats = Array.isArray(booking.seats) ? booking.seats.join(", ") : booking.seats || "G1";
+  const totalAmount = booking.total_amount || booking.totalAmount || "0.00";
+  const userName = booking.user_name || booking.userName || "Valued Guest";
+
+  // Generate the professional PDF pass with Logo and QR code
+  let pdfBuffer = null;
+  try {
+    pdfBuffer = await generateTicketPdf({
+      bookingCode,
+      movieTitle,
+      cinemaName,
+      showDate,
+      showTime,
+      seats,
+      totalAmount,
+      userName,
+      userEmail: recipientEmail,
+    });
+  } catch (pdfErr) {
+    console.error("❌ PDF Generation Error:", pdfErr.message);
+  }
+
+  if (!user || !pass || user === "your_email@gmail.com") {
+    console.log("\n-------------------------------------------");
+    console.log("🎟️ LUMIÈRE TICKET CONFIRMED (LOG MODE)");
+    console.log("To:", recipientEmail);
+    console.log("Booking Code:", bookingCode);
+    console.log("Movie:", movieTitle);
+    console.log("Seats:", seats);
+    console.log("Total: ₹" + totalAmount);
+    console.log("PDF Generated:", pdfBuffer ? `${pdfBuffer.length} bytes` : "No");
+    console.log("-------------------------------------------\n");
+    return { success: true, mode: "test" };
+  }
+
+  try {
+    const transporter = getTransporter();
+
+    // Clean, professional email without complex layout
+    const simpleEmailHtml = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; color: #1e293b; line-height: 1.6; max-width: 600px; padding: 20px;">
+        <h2 style="color: #0f172a; margin-top: 0; border-bottom: 2px solid #f59e0b; padding-bottom: 8px;">🎬 Booking Confirmed — LUMIÈRE Cinemas</h2>
+        <p>Dear <strong>${userName}</strong>,</p>
+        <p>Thank you for choosing LUMIÈRE Premier Luxury Cinemas. Your booking for <strong>${movieTitle}</strong> has been successfully confirmed.</p>
+        
+        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #f59e0b; border-radius: 6px; padding: 16px 20px; margin: 20px 0;">
+          <p style="margin: 4px 0;"><strong>Booking Reference:</strong> <span style="font-size: 16px; color: #b45309; font-weight: bold; font-family: monospace;">${bookingCode}</span></p>
+          <p style="margin: 4px 0;"><strong>Movie:</strong> ${movieTitle}</p>
+          <p style="margin: 4px 0;"><strong>Cinema Hall:</strong> ${cinemaName}</p>
+          <p style="margin: 4px 0;"><strong>Showtime:</strong> ${showDate} · ${showTime}</p>
+          <p style="margin: 4px 0;"><strong>Seats:</strong> <span style="color: #15803d; font-weight: bold;">${seats}</span></p>
+          <p style="margin: 4px 0;"><strong>Total Paid:</strong> ₹${totalAmount}</p>
+        </div>
+
+        <p>📎 <strong>Your Official Ticket Pass with Scannable Gate QR Code is attached to this email as a PDF.</strong></p>
+        <p>You can download and open the attached PDF on your phone or print it. Present the QR code on the PDF at the cinema entrance for direct verification by our staff.</p>
+
+        <p style="margin-top: 32px; font-size: 13px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+          Please arrive 15 minutes before showtime. Food and beverages can be ordered directly to your recliner seats.<br><br>
+          Warm regards,<br>
+          <strong>LUMIÈRE Luxury Cinemas Team</strong><br>
+          <span style="color: #94a3b8;">www.lumierecinemas.com | 1800-LUMIERE</span>
+        </p>
+      </div>
+    `;
+
+    const mailOptions = {
+      from: `"LUMIÈRE Cinemas" <${user}>`,
+      to: recipientEmail,
+      subject: `🎬 Booking Confirmed: ${movieTitle} [${bookingCode}]`,
+      html: simpleEmailHtml,
+      attachments: pdfBuffer
+        ? [
+            {
+              filename: `Lumiere-Ticket-${bookingCode}.pdf`,
+              content: pdfBuffer,
+              contentType: "application/pdf",
+            },
+          ]
+        : [],
+    };
+
+    console.log(`📤 Sending Booking confirmation email with PDF to ${recipientEmail}...`);
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`✅ Ticket Email sent to ${recipientEmail}! Message ID: ${info.messageId}`);
+    return { success: true, mode: "real", messageId: info.messageId };
+  } catch (error) {
+    console.error("❌ Ticket Email Error:", error.message);
+    return { success: false, error: error.message };
+  }
+}
+
 // Test connection on module load
 function checkEmailConnection() {
   require("dotenv").config();
@@ -274,5 +386,6 @@ checkEmailConnection();
 module.exports = {
   generate8DigitOtp,
   sendOtpEmail,
+  sendBookingEmail,
   checkEmailConnection,
 };

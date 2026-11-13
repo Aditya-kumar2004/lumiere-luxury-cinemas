@@ -21,6 +21,7 @@ import {
   Sparkles,
   KeyRound,
   RotateCw,
+  Ticket,
 } from "lucide-react";
 import heroImax from "@/assets/hero-imax.jpg";
 import heroVip from "@/assets/hero-vip-lounge.jpg";
@@ -170,6 +171,44 @@ export default function AuthForm({ mode }) {
   const inputClass =
     "h-10.5 w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground";
 
+  const getRedirectTarget = (role) => {
+    if (typeof window === "undefined") return "/";
+    const r = role?.toLowerCase();
+    // Admin lands directly in Admin Dashboard (/admin), unless they were navigating to /movies or /book/
+    if (r === "admin") {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const target = params.get("redirect");
+        if (target && (target.startsWith("/book/") || target.startsWith("/movies"))) {
+          return target;
+        }
+      } catch {}
+      return "/admin";
+    }
+
+    // Staff lands directly in Staff Dashboard (/staff), unless they were navigating to /movies or /book/
+    if (r === "staff") {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const target = params.get("redirect");
+        if (target && (target.startsWith("/book/") || target.startsWith("/movies"))) {
+          return target;
+        }
+      } catch {}
+      return "/staff";
+    }
+
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const target = params.get("redirect");
+      if (target && target.startsWith("/")) {
+        return target;
+      }
+    } catch {}
+
+    return "/";
+  };
+
   // Submit Register or Login Form
   const submit = async (e) => {
     e.preventDefault();
@@ -212,7 +251,8 @@ export default function AuthForm({ mode }) {
           localStorage.setItem("lumiere-user", JSON.stringify(data.user));
           window.dispatchEvent(new Event("lumiere-auth-change"));
           toast.success("Welcome back, " + data.user.name + "!");
-          setTimeout(() => navigate({ to: "/" }), 600);
+          const target = getRedirectTarget(data.user?.role);
+          setTimeout(() => navigate({ to: target }), 600);
         } else if (data.requiresVerification) {
           setOtpStep(true);
           toast.info("Please verify your account with the 8-digit code.");
@@ -222,7 +262,8 @@ export default function AuthForm({ mode }) {
       } catch {
         // Fallback for offline demo
         toast.success("Welcome back! (Demo Session Active)");
-        setTimeout(() => navigate({ to: "/" }), 600);
+        const target = getRedirectTarget(data.user?.role);
+        setTimeout(() => navigate({ to: target }), 600);
       } finally {
         setIsSubmitting(false);
       }
@@ -284,7 +325,8 @@ export default function AuthForm({ mode }) {
         toast.success("Account Verified!", {
           description: "Welcome to LUMIÈRE Cinemas VIP membership.",
         });
-        setTimeout(() => navigate({ to: "/" }), 700);
+        const target = getRedirectTarget(data.user?.role);
+        setTimeout(() => navigate({ to: target }), 700);
       } else {
         const errorMsg = data.message || "Invalid code. Please try again.";
         setOtpError(errorMsg);
@@ -297,7 +339,8 @@ export default function AuthForm({ mode }) {
       toast.success("Account Activated!", {
         description: "Welcome to LUMIÈRE Cinemas.",
       });
-      setTimeout(() => navigate({ to: "/" }), 700);
+      const target = getRedirectTarget();
+      setTimeout(() => navigate({ to: target }), 700);
     } finally {
       setIsSubmitting(false);
     }
@@ -529,6 +572,24 @@ export default function AuthForm({ mode }) {
           ) : (
             /* SCREEN 2: LOGIN / REGISTER FORMS */
             <div>
+              {getRedirectTarget() !== "/" && (
+                <div className="mb-4 flex items-center gap-2 rounded-md border border-primary/40 bg-primary/10 px-3.5 py-2.5 text-xs text-primary font-medium">
+                  <Ticket className="h-4 w-4 shrink-0" />
+                  <span>
+                    {(() => {
+                      try {
+                        if (typeof window !== "undefined") {
+                          const target = new URLSearchParams(window.location.search).get("redirect");
+                          if (target && target.startsWith("/movies")) {
+                            return "Please sign in or create an account to browse all movies in theatres.";
+                          }
+                        }
+                      } catch {}
+                      return "Please sign in or register to complete your movie ticket booking.";
+                    })()}
+                  </span>
+                </div>
+              )}
               <div>
                 <h1 className="font-display text-2xl xs:text-3xl sm:text-4xl tracking-wide text-foreground">
                   {isLogin ? "WELCOME BACK" : "CREATE ACCOUNT"}
@@ -742,6 +803,7 @@ export default function AuthForm({ mode }) {
                 {isLogin ? "New to LUMIÈRE? " : "Already have an account? "}
                 <Link
                   to={isLogin ? "/register" : "/login"}
+                  search={getRedirectTarget() !== "/" ? { redirect: getRedirectTarget() } : undefined}
                   className="font-bold text-primary transition hover:underline"
                 >
                   {isLogin ? "Create an account" : "Sign In"}

@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     city VARCHAR(60),
     dob DATE,
     password VARCHAR(255) NOT NULL,
-    role VARCHAR(20) DEFAULT 'customer',
+    role VARCHAR(20) DEFAULT 'user',
     otp VARCHAR(10),
     otp_expires_at TIMESTAMP,
     is_verified BOOLEAN DEFAULT FALSE,
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS bookings (
     user_email VARCHAR(180) NOT NULL,
     user_name VARCHAR(120) NOT NULL,
     user_phone VARCHAR(20),
-    movie_id VARCHAR(60) REFERENCES movies(id) ON DELETE SET NULL,
+    movie_id VARCHAR(60),
     movie_title VARCHAR(200) NOT NULL,
     cinema_name VARCHAR(120) NOT NULL,
     city VARCHAR(60) NOT NULL,
@@ -69,11 +69,29 @@ CREATE TABLE IF NOT EXISTS bookings (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Ensure foreign key constraint is removed so bookings never fail due to movie id variations
+ALTER TABLE bookings DROP CONSTRAINT IF EXISTS bookings_movie_id_fkey;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS is_admitted BOOLEAN DEFAULT FALSE;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS admitted_at TIMESTAMP;
+
 -- 5. NEWSLETTER SUBSCRIBERS TABLE (Only registered/authenticated users can subscribe)
 CREATE TABLE IF NOT EXISTS subscribers (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(id) ON DELETE CASCADE,
     email VARCHAR(180) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 6. ADMIN ACTIVITY LOGS TABLE (Movie Deletion & Catalog History)
+CREATE TABLE IF NOT EXISTS admin_logs (
+    id SERIAL PRIMARY KEY,
+    action VARCHAR(50) NOT NULL,
+    movie_id VARCHAR(100),
+    movie_title VARCHAR(200) NOT NULL,
+    details TEXT,
+    poster_deleted BOOLEAN DEFAULT FALSE,
+    performed_by VARCHAR(180) NOT NULL,
+    performed_by_name VARCHAR(120),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

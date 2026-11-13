@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import {
   Play,
   ArrowRight,
@@ -48,10 +49,22 @@ const SLIDES = [
 ];
 
 export default function HeroSection() {
+  const navigate = useNavigate();
   const bg = useRef(null);
   const [current, setCurrent] = useState(0);
   const [trailer, setTrailer] = useState(false);
   const [paused, setPaused] = useState(false);
+
+  const handleExploreMovies = (e) => {
+    try {
+      const user = window.localStorage.getItem("lumiere-user");
+      if (!user) {
+        e.preventDefault();
+        toast.info("Please sign in or create an account to view all movies.");
+        navigate({ to: "/login", search: { redirect: "/movies" } });
+      }
+    } catch {}
+  };
 
   const nextSlide = useCallback(() => {
     setCurrent((prev) => (prev + 1) % SLIDES.length);
@@ -111,18 +124,18 @@ export default function HeroSection() {
             </span>
           </div>
 
-          <h1 className="font-display-tight text-[2.4rem] xs:text-[3.1rem] text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)] sm:text-7xl lg:text-[6.2rem] leading-[1.05]">
+          <h1 className="font-display text-2xl xs:text-3xl sm:text-4xl lg:text-[2.75rem] xl:text-[3.25rem] font-bold tracking-wide text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)] leading-[1.15]">
             Experience movies
             <br />
             <span className="text-primary">like never before.</span>
           </h1>
 
-          <p className="mt-6 max-w-lg text-base leading-relaxed text-zinc-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)] sm:text-lg">
+          <p className="mt-4 max-w-lg text-sm leading-relaxed text-zinc-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)] sm:text-base">
             Discover the latest blockbusters, explore upcoming releases and book your favourite
             seats for an unforgettable cinematic experience.
           </p>
 
-          <ul className="mt-7 flex flex-wrap gap-x-6 gap-y-3">
+          <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-3">
             {HIGHLIGHTS.map(({ icon: Icon, label }) => (
               <li
                 key={label}
@@ -136,8 +149,12 @@ export default function HeroSection() {
             ))}
           </ul>
 
-          <div className="mt-9 flex flex-col xs:flex-row flex-wrap gap-3">
-            <Link to="/movies" className="btn-gold !px-6 !py-3.5 shadow-lg w-full xs:w-auto">
+          <div className="mt-7 flex flex-col xs:flex-row flex-wrap gap-3">
+            <Link
+              to="/movies"
+              onClick={handleExploreMovies}
+              className="btn-gold !px-6 !py-3.5 shadow-lg w-full xs:w-auto"
+            >
               Explore Movies <ArrowRight className="h-4 w-4" />
             </Link>
             <button
@@ -153,7 +170,7 @@ export default function HeroSection() {
           </div>
 
           {/* Carousel Slide Indicators & Controls */}
-          <div className="mt-10 flex items-center gap-4">
+          <div className="mt-8 flex items-center gap-4">
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -223,7 +240,7 @@ export default function HeroSection() {
                 <span className="h-1 w-1 rounded-full bg-zinc-600" />
                 <span>{FEATURED.duration}</span>
               </div>
-              <h3 className="mt-3 font-display text-4xl tracking-wide text-white">
+              <h3 className="mt-2.5 font-display text-2xl sm:text-3xl tracking-wide text-white">
                 {FEATURED.title}
               </h3>
               <p className="mt-2 line-clamp-2 text-sm text-zinc-300">{FEATURED.description}</p>

@@ -11,7 +11,7 @@ const ITEMS = [
 
 export default function FeatureStrip() {
   return (
-    <section className="container-cine relative z-10 -mt-10">
+    <section className="container-cine relative z-10 my-8 sm:my-12">
       <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border shadow-card md:grid-cols-3 xl:grid-cols-6">
         {ITEMS.map(({ icon: Icon, title, text }) => (
           <div

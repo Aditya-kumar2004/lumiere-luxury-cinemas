@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Play, Ticket, Clock, Calendar } from "lucide-react";
+import { toast } from "sonner";
 import { FEATURED } from "@/data/movies";
 import Rating from "./Rating";
 import Reveal from "./Reveal";
@@ -8,6 +9,21 @@ import TrailerDialog from "./TrailerDialog";
 
 export default function FeaturedMovie({ movie = FEATURED }) {
   const [trailer, setTrailer] = useState(false);
+  const navigate = useNavigate();
+
+  const handleBookTickets = (e) => {
+    try {
+      const user = window.localStorage.getItem("lumiere-user");
+      if (!user) {
+        e.preventDefault();
+        toast.info("Please sign in or create an account to book tickets.");
+        navigate({
+          to: "/login",
+          search: { redirect: movie.id ? `/book/${movie.id}` : "/movies" },
+        });
+      }
+    } catch {}
+  };
   return (
     <Reveal as="section" className="container-cine py-14">
       <div className="group relative isolate overflow-hidden rounded-lg border border-border shadow-card">
@@ -22,7 +38,9 @@ export default function FeaturedMovie({ movie = FEATURED }) {
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/95 via-black/80 to-transparent" />
         <div className="max-w-xl px-5 py-10 xs:px-6 xs:py-12 sm:px-12 sm:py-20 lg:py-24">
           <p className="mb-3 text-xs font-bold tracking-[0.3em] text-primary">FEATURED PREMIERE</p>
-          <h2 className="font-display-tight text-3xl xs:text-4xl sm:text-6xl lg:text-7xl text-white">{movie.title}</h2>
+          <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-bold tracking-wide text-white">
+            {movie.title}
+          </h2>
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-zinc-300">
             <Rating value={movie.rating} />
             <span>{movie.genres.join(" / ")}</span>
@@ -40,7 +58,11 @@ export default function FeaturedMovie({ movie = FEATURED }) {
           </div>
           <p className="mt-4 text-sm sm:text-base leading-relaxed text-zinc-300">{movie.description}</p>
           <div className="mt-7 flex flex-col xs:flex-row flex-wrap gap-3">
-            <Link to="/movies" className="btn-gold w-full xs:w-auto">
+            <Link
+              to={movie?.id ? `/book/${movie.id}` : "/movies"}
+              onClick={handleBookTickets}
+              className="btn-gold w-full xs:w-auto"
+            >
               <Ticket className="h-4 w-4" /> Book Tickets
             </Link>
             <button

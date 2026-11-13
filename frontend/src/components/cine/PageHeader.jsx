@@ -6,20 +6,27 @@ export default function PageHeader({
   title,
   subtitle,
   breadcrumbs = [{ label: "Home", to: "/" }, { label: "Movies" }],
+  centered = false,
   children,
 }) {
   return (
-    <section className="relative overflow-hidden border-b border-border bg-surface/70 pb-6 pt-24 backdrop-blur-sm lg:pb-8 lg:pt-26">
+    <section className="relative overflow-hidden border-b border-border bg-surface/70 pb-8 pt-24 backdrop-blur-sm lg:pb-10 lg:pt-28">
       {/* Subtle ambient illumination */}
-      <div className="pointer-events-none absolute -top-32 left-1/2 h-80 w-[900px] -translate-x-1/2 bg-glow-gold opacity-50 blur-3xl" />
+      <div className="pointer-events-none absolute -top-32 left-1/2 h-88 w-[900px] -translate-x-1/2 bg-glow-gold opacity-50 blur-3xl" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
 
-      <div className="container-cine relative z-10">
+      <div
+        className={`container-cine relative z-10 ${
+          centered ? "flex flex-col items-center text-center" : ""
+        }`}
+      >
         {/* Breadcrumbs */}
         {breadcrumbs && breadcrumbs.length > 0 && (
           <nav
             aria-label="Breadcrumb"
-            className="mb-2.5 flex items-center gap-1.5 text-xs text-muted-foreground"
+            className={`mb-3 flex items-center gap-1.5 text-xs text-muted-foreground ${
+              centered ? "justify-center" : ""
+            }`}
           >
             {breadcrumbs.map((b, i) => (
               <span key={b.label} className="inline-flex items-center gap-1.5">
@@ -37,7 +44,7 @@ export default function PageHeader({
         )}
 
         {eyebrow && (
-          <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold tracking-[0.25em] text-primary">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-bold tracking-[0.2em] text-primary shadow-xs">
             <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
             {eyebrow}
           </div>
@@ -48,12 +55,20 @@ export default function PageHeader({
         </h1>
 
         {subtitle && (
-          <p className="mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
+          <p
+            className={`mt-2.5 max-w-xl text-xs sm:text-sm leading-relaxed text-muted-foreground ${
+              centered ? "mx-auto text-center" : ""
+            }`}
+          >
             {subtitle}
           </p>
         )}
 
-        {children && <div className="mt-4">{children}</div>}
+        {children && (
+          <div className={`mt-5 w-full ${centered ? "flex flex-col items-center" : ""}`}>
+            {children}
+          </div>
+        )}
       </div>
     </section>
   );

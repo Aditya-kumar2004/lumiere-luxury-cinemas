@@ -1,19 +1,39 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Clock, Flame, Ticket, Info, Bell } from "lucide-react";
+import { toast } from "sonner";
 import Rating from "./Rating";
 
 /** variant: "full" (Now Showing grid) | "compact" (carousels) | "soon" */
 export default function MovieCard({ movie, variant = "full", badge, onRemind, reminded }) {
+  const navigate = useNavigate();
   const isSoon = movie.status === "soon";
+
+  const handleBookClick = (e) => {
+    try {
+      const user = window.localStorage.getItem("lumiere-user");
+      if (!user) {
+        e.preventDefault();
+        toast.info("Please sign in or create an account to book tickets.");
+        navigate({
+          to: "/login",
+          search: { redirect: `/book/${movie.id}` },
+        });
+      }
+    } catch {}
+  };
   return (
     <article className="group relative flex flex-col">
       <div className="relative aspect-[2/3] overflow-hidden rounded-md border border-border bg-card shadow-card">
         <img
           src={movie.poster}
-          alt={`${movie.title} poster`}
+          alt=""
           loading="lazy"
           width={672}
           height={992}
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&auto=format&fit=crop&q=80";
+          }}
           className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
         />
         {movie.age && (
@@ -49,6 +69,7 @@ export default function MovieCard({ movie, variant = "full", badge, onRemind, re
               <Link
                 to="/book/$movieId"
                 params={{ movieId: movie.id }}
+                onClick={handleBookClick}
                 className="btn-gold !px-3 !py-2 !text-xs"
               >
                 <Ticket className="h-3.5 w-3.5" /> Book Tickets
@@ -91,14 +112,36 @@ export default function MovieCard({ movie, variant = "full", badge, onRemind, re
             <Rating value={movie.rating} /> <span>{movie.year}</span>
           </div>
         )}
-        {variant === "full" && !isSoon && (
-          <Link
-            to="/book/$movieId"
-            params={{ movieId: movie.id }}
-            className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-md border border-primary/40 py-2 text-xs font-bold text-primary transition hover:bg-primary hover:text-primary-foreground md:hidden"
-          >
-            <Ticket className="h-3.5 w-3.5" /> Book Tickets
-          </Link>
+        {variant === "full" && (
+          <div className="mt-3 flex items-center gap-2">
+            {!isSoon ? (
+              <Link
+                to="/book/$movieId"
+                params={{ movieId: movie.id }}
+                onClick={handleBookClick}
+                className="btn-gold flex flex-1 items-center justify-center gap-1.5 !py-2 !text-xs font-bold shadow-sm"
+              >
+                <Ticket className="h-3.5 w-3.5" /> Book Tickets
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => onRemind?.(movie)}
+                className="btn-outline flex flex-1 items-center justify-center gap-1.5 !py-2 !text-xs text-muted-foreground hover:text-foreground"
+              >
+                <Bell className="h-3.5 w-3.5" /> {reminded ? "Reminder Set" : "Coming Soon"}
+              </button>
+            )}
+            <Link
+              to="/movies/$movieId"
+              params={{ movieId: movie.id }}
+              className="inline-flex items-center justify-center rounded-md border border-border/80 bg-card p-2 text-xs font-semibold text-muted-foreground transition hover:border-primary/50 hover:text-primary"
+              aria-label={`View details for ${movie.title}`}
+              title="View Details"
+            >
+              <Info className="h-4 w-4" />
+            </Link>
+          </div>
         )}
       </div>
     </article>

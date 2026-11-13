@@ -1,5 +1,6 @@
-import { getRouteApi, Link } from "@tanstack/react-router";
+import { getRouteApi, Link, useNavigate } from "@tanstack/react-router";
 import { Clock, Globe, Calendar, Ticket, ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 import Rating from "@/components/cine/Rating";
 
 const Route = getRouteApi("/movies/$movieId");
@@ -21,8 +22,23 @@ export function MovieNotFound() {
 }
 
 export default function MovieDetailsPage() {
+  const navigate = useNavigate();
   const { movie } = Route.useLoaderData();
   const soon = movie.status === "soon";
+
+  const handleBookClick = (e) => {
+    try {
+      const user = window.localStorage.getItem("lumiere-user");
+      if (!user) {
+        e.preventDefault();
+        toast.info("Please sign in or create an account to book tickets.");
+        navigate({
+          to: "/login",
+          search: { redirect: `/book/${movie.id}` },
+        });
+      }
+    } catch {}
+  };
   return (
     <section className="relative isolate overflow-hidden pb-20 pt-28">
       <img
@@ -41,9 +57,13 @@ export default function MovieDetailsPage() {
         <div className="grid gap-8 md:grid-cols-[280px_1fr] lg:grid-cols-[320px_1fr] lg:gap-16">
           <img
             src={movie.poster}
-            alt={`${movie.title} poster`}
+            alt=""
             width={672}
             height={992}
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&auto=format&fit=crop&q=80";
+            }}
             className="mx-auto md:mx-0 w-full max-w-[260px] xs:max-w-xs rounded-lg border border-border shadow-card"
           />
           <div className="min-w-0">
@@ -90,6 +110,7 @@ export default function MovieDetailsPage() {
                 <Link
                   to="/book/$movieId"
                   params={{ movieId: movie.id }}
+                  onClick={handleBookClick}
                   className="btn-gold !px-7 !py-3.5 w-full xs:w-auto text-center"
                 >
                   <Ticket className="h-4 w-4" /> Book Tickets

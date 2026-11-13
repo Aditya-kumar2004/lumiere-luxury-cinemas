@@ -52,8 +52,16 @@ export function PosterGrid({ movies }) {
   );
 }
 
-export default function MovieGrid({ movies }) {
+export default function MovieGrid({ movies = [] }) {
   const [genre, setGenre] = useState("All Movies");
+
+  // Filter movies by chosen genre
+  const filteredMovies = filterByGenre(movies, genre);
+  // Show 12 movies on Now Showing section
+  const displayedMovies = filteredMovies.slice(0, 12);
+  const totalCount = filteredMovies.length;
+  const hasMore = totalCount > 12;
+
   return (
     <Reveal as="section" id="now-showing" className="container-cine scroll-mt-24 pb-10 pt-20">
       <SectionHeading
@@ -63,14 +71,32 @@ export default function MovieGrid({ movies }) {
         action={
           <Link
             to="/movies"
-            className="hidden shrink-0 items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary-hover sm:inline-flex"
+            className="group inline-flex shrink-0 items-center gap-1.5 text-xs sm:text-sm font-semibold text-primary hover:text-primary-hover cursor-pointer transition hover:translate-x-0.5 active:scale-95"
+            aria-label="View all movies"
           >
-            View all <ArrowRight className="h-4 w-4" />
+            <span>View all</span>
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
         }
       />
       <GenreFilters value={genre} onChange={setGenre} />
-      <PosterGrid movies={filterByGenre(movies, genre)} />
+      <PosterGrid movies={displayedMovies} />
+
+      {/* When there are more than 12 movies, show button to view full catalogue */}
+      {hasMore && (
+        <div className="mt-10 flex flex-col items-center justify-center gap-3 text-center">
+          <Link
+            to="/movies"
+            className="group inline-flex items-center gap-2 rounded-xl border border-primary/40 bg-primary/10 px-6 py-3 text-sm font-bold text-primary transition-all hover:border-primary hover:bg-primary hover:text-primary-foreground active:scale-95 shadow-sm"
+          >
+            <span>View All Movies in Theatres ({totalCount})</span>
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
+          <p className="text-xs text-muted-foreground">
+            Explore all {totalCount} movies currently playing across all halls and timings.
+          </p>
+        </div>
+      )}
     </Reveal>
   );
 }

@@ -1,18 +1,31 @@
 import { useEffect, useState } from "react";
-import { Link, useRouterState } from "@tanstack/react-router";
-import { MapPin, ChevronDown, Menu, X, Ticket, User, Sun, Moon, LogOut, Sparkles } from "lucide-react";
+import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
+import {
+  MapPin,
+  ChevronDown,
+  Menu,
+  X,
+  Ticket,
+  User,
+  Sun,
+  Moon,
+  LogOut,
+  ScanLine,
+  LayoutDashboard,
+  Crown,
+} from "lucide-react";
 import { toast } from "sonner";
 import Logo from "./Logo";
 import LocationDialog from "./LocationDialog";
+import MyBookingsDialog from "./MyBookingsDialog";
+import StaffScannerDialog from "./StaffScannerDialog";
 import { useTheme } from "@/hooks/useTheme";
 
 const NAV = [
   { label: "Home", to: "/", key: "home" },
-  { label: "Movies", to: "/movies", key: "movies" },
   { label: "Now Showing", to: "/", hash: "now-showing", key: "now-showing" },
   { label: "Coming Soon", to: "/", hash: "coming-soon", key: "coming-soon" },
   { label: "Cinemas", to: "/", hash: "cinemas", key: "cinemas" },
-  { label: "Offers", to: "/", hash: "offers", key: "offers" },
 ];
 
 // Circular Profile Avatar Component
@@ -49,20 +62,53 @@ export default function Navbar() {
   const [city, setCity] = useState("Mumbai");
   const [user, setUser] = useState(null);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [bookingsOpen, setBookingsOpen] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [ticketCount, setTicketCount] = useState(0);
 
   const { isDark, toggleTheme } = useTheme();
+  const navigate = useNavigate();
   const { pathname, hash } = useRouterState({
     select: (s) => ({ pathname: s.location.pathname, hash: s.location.hash }),
   });
 
   const isOverHero = pathname === "/" && !scrolled && !mobileOpen;
+  const isStaffRoute = pathname.startsWith("/staff");
+  const isAdminRoute = pathname.startsWith("/admin");
+  const isInternalRoute = isStaffRoute || isAdminRoute;
 
-  // Sync Logged-In User from LocalStorage
+  const handleBookTicketsNav = (e) => {
+    if (!user) {
+      if (e) e.preventDefault();
+      toast.info("Please sign in or create an account to book tickets.");
+      navigate({ to: "/login", search: { redirect: "/movies" } });
+    } else {
+      navigate({ to: "/movies" });
+    }
+  };
+
+  // Sync Logged-In User from LocalStorage and backend
   useEffect(() => {
     const checkUser = () => {
       try {
         const saved = window.localStorage.getItem("lumiere-user");
-        setUser(saved ? JSON.parse(saved) : null);
+        const parsed = saved ? JSON.parse(saved) : null;
+        setUser(parsed);
+
+        const token = window.localStorage.getItem("lumiere-token");
+        if (token) {
+          fetch("http://localhost:5000/api/auth/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+            .then((r) => r.json())
+            .then((data) => {
+              if (data.success && data.user) {
+                window.localStorage.setItem("lumiere-user", JSON.stringify(data.user));
+                setUser(data.user);
+              }
+            })
+            .catch(() => {});
+        }
       } catch {
         setUser(null);
       }
@@ -77,6 +123,27 @@ export default function Navbar() {
       window.removeEventListener("lumiere-auth-change", checkUser);
     };
   }, [pathname]);
+
+  // Fetch user's booking count
+  useEffect(() => {
+    if (!user) {
+      setTicketCount(0);
+      return;
+    }
+    const token = window.localStorage.getItem("lumiere-token");
+    if (!token) return;
+
+    fetch("http://localhost:5000/api/bookings/my-bookings", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
+          setTicketCount(data.totalBookings || 0);
+        }
+      })
+      .catch(() => {});
+  }, [user, bookingsOpen]);
 
   // Close profile dropdown on outside click or route change
   useEffect(() => {
@@ -112,6 +179,7 @@ export default function Navbar() {
     setProfileOpen(false);
     window.dispatchEvent(new Event("lumiere-auth-change"));
     toast.success("Signed out successfully. See you soon at LUMIÈRE!");
+    navigate({ to: "/" });
   };
 
   const activeKey = pathname.startsWith("/movies")
@@ -182,10 +250,24 @@ export default function Navbar() {
           {/* Logo (Already contains its own Link to="/" inside Logo.jsx) */}
           <Logo contrast={isOverHero ? "light" : undefined} />
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden items-center gap-7 lg:flex" aria-label="Main">
-            {NAV.map((n) => navLink(n))}
-          </nav>
+          {/* Desktop Nav Links (Hidden on Admin & Staff Dashboards) */}
+          {!isInternalRoute ? (
+            <nav className="hidden items-center gap-7 lg:flex" aria-label="Main">
+              {NAV.map((n) => navLink(n))}
+            </nav>
+          ) : (
+            <div className="hidden lg:flex items-center gap-2">
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-bold tracking-wider border ${
+                  isAdminRoute
+                    ? "bg-purple-500/15 border-purple-500/30 text-purple-600 dark:text-purple-400"
+                    : "bg-amber-500/15 border-amber-500/30 text-amber-600 dark:text-amber-500"
+                }`}
+              >
+                {isAdminRoute ? "ADMIN CONTROL CENTER" : "STAFF CONTROL CENTER"}
+              </span>
+            </div>
+          )}
 
           {/* Right Action Icons & Buttons */}
           <div className="flex items-center gap-3">
@@ -248,19 +330,97 @@ export default function Navbar() {
                   {profileOpen && (
                     <div
                       onClick={(e) => e.stopPropagation()}
-                      className="absolute right-0 top-12 z-50 w-64 rounded-xl border border-border bg-card/95 p-4 shadow-2xl backdrop-blur-md animate-in fade-in-50 zoom-in-95"
+                      className="absolute right-0 top-12 z-50 w-72 rounded-xl border border-primary/40 bg-card/95 p-4 shadow-2xl backdrop-blur-md animate-in fade-in-50 zoom-in-95"
                     >
                       <div className="flex items-center gap-3 border-b border-border/60 pb-3">
                         <UserAvatar user={user} size="lg" />
                         <div className="min-w-0 flex-1 text-left">
                           <p className="truncate text-sm font-bold text-foreground">{user.name}</p>
                           <p className="truncate text-xs text-muted-foreground">{user.email}</p>
-                          <span className="mt-1 inline-block rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
-                            VIP Member
-                          </span>
+                          <div className="mt-1 flex items-center gap-1.5">
+                            <span className="inline-block rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+                              VIP Member
+                            </span>
+                            <span className="inline-block rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
+                              {ticketCount} {ticketCount === 1 ? "Ticket" : "Tickets"}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                      <div className="pt-2">
+                      <div className="pt-2 space-y-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setProfileOpen(false);
+                            if (pathname === "/staff") {
+                              window.dispatchEvent(
+                                new CustomEvent("lumiere-switch-staff-tab", { detail: "passes" })
+                              );
+                            } else {
+                              setBookingsOpen(true);
+                            }
+                          }}
+                          className="flex w-full items-center justify-between rounded-md px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-primary/15 hover:text-primary"
+                        >
+                          <span className="inline-flex items-center gap-2">
+                            <Ticket className="h-4 w-4 text-primary" /> My Cinema Passes
+                          </span>
+                          <span className="rounded bg-primary/20 px-1.5 py-0.5 text-[10px] font-bold text-primary">
+                            {ticketCount}
+                          </span>
+                        </button>
+
+                        {/* Staff Gate Scanner (Staff Only) */}
+                        {user.role === "staff" && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setProfileOpen(false);
+                              setScannerOpen(true);
+                            }}
+                            className="flex w-full items-center justify-between rounded-md px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-amber-500/15 hover:text-amber-400"
+                          >
+                            <span className="inline-flex items-center gap-2">
+                              <ScanLine className="h-4 w-4 text-amber-400" /> Staff Gate Scanner
+                            </span>
+                            <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold text-amber-400">
+                              SCAN
+                            </span>
+                          </button>
+                        )}
+
+                        {/* Admin Dashboard Access (Admin Only) */}
+                        {user.role === "admin" && (
+                          <Link
+                            to="/admin"
+                            onClick={() => setProfileOpen(false)}
+                            className="flex w-full items-center justify-between rounded-md px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-purple-500/15 hover:text-purple-600 dark:hover:text-purple-400"
+                          >
+                            <span className="inline-flex items-center gap-2">
+                              <Crown className="h-4 w-4 text-purple-500" /> Admin Dashboard
+                            </span>
+                            <span className="rounded bg-purple-500/20 px-1.5 py-0.5 text-[9px] font-bold text-purple-600 dark:text-purple-400">
+                              ADMIN
+                            </span>
+                          </Link>
+                        )}
+
+                        {/* Staff Dashboard Access (Staff Only) */}
+                        {user.role === "staff" && (
+                          <Link
+                            to="/staff"
+                            onClick={() => setProfileOpen(false)}
+                            className="flex w-full items-center justify-between rounded-md px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-amber-500/15 hover:text-amber-500"
+                          >
+                            <span className="inline-flex items-center gap-2">
+                              <LayoutDashboard className="h-4 w-4 text-amber-500" /> Staff Operations
+                            </span>
+                            <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold text-amber-500">
+                              STAFF
+                            </span>
+                          </Link>
+                        )}
+
                         <button
                           type="button"
                           onClick={handleLogout}
@@ -272,6 +432,30 @@ export default function Navbar() {
                     </div>
                   )}
                 </div>
+
+                {/* Admin / Staff Desktop Quick Button */}
+                {!isInternalRoute && user.role === "admin" ? (
+                  <Link
+                    to="/admin"
+                    className="hidden lg:inline-flex items-center gap-1.5 rounded-full border border-purple-500/40 bg-purple-500/10 px-3 py-1.5 text-xs font-bold text-purple-600 dark:text-purple-400 hover:bg-purple-600 hover:text-white transition shadow-sm"
+                  >
+                    <Crown className="h-3.5 w-3.5" /> Admin Dashboard
+                  </Link>
+                ) : !isInternalRoute && user.role === "staff" ? (
+                  <Link
+                    to="/staff"
+                    className="hidden lg:inline-flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1.5 text-xs font-bold text-amber-500 hover:bg-amber-500 hover:text-black transition shadow-sm"
+                  >
+                    <LayoutDashboard className="h-3.5 w-3.5" /> Staff Dashboard
+                  </Link>
+                ) : isInternalRoute ? (
+                  <Link
+                    to="/"
+                    className="hidden lg:inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground hover:border-primary transition"
+                  >
+                    Exit to Cinema Site
+                  </Link>
+                ) : null}
 
                 {/* Mobile / Tablet Avatar Button */}
                 <button
@@ -295,7 +479,7 @@ export default function Navbar() {
             )}
 
             {/* Book Tickets CTA */}
-            <Link to="/movies" className="btn-gold hidden !py-2.5 sm:inline-flex">
+            <Link to="/movies" onClick={handleBookTicketsNav} className="btn-gold hidden !py-2.5 sm:inline-flex">
               <Ticket className="h-4 w-4" /> Book Tickets
             </Link>
 
@@ -318,7 +502,28 @@ export default function Navbar() {
         {mobileOpen && (
           <div className="border-t border-border bg-nav lg:hidden animate-in slide-in-from-top-2">
             <nav className="container-cine flex flex-col gap-1 py-4" aria-label="Mobile">
-              {NAV.map((n) => navLink(n, true))}
+              {!isInternalRoute ? (
+                NAV.map((n) => navLink(n, true))
+              ) : (
+                <div className="py-2 space-y-2">
+                  <span
+                    className={`inline-block rounded px-2.5 py-1 text-xs font-bold border ${
+                      isAdminRoute
+                        ? "bg-purple-500/15 border-purple-500/30 text-purple-600 dark:text-purple-400"
+                        : "bg-amber-500/15 border-amber-500/30 text-amber-500"
+                    }`}
+                  >
+                    {isAdminRoute ? "ADMIN CONTROL CENTER" : "STAFF CONTROL CENTER"}
+                  </span>
+                  <Link
+                    to="/"
+                    onClick={() => setMobileOpen(false)}
+                    className="block text-sm font-semibold text-primary hover:underline"
+                  >
+                    ← Exit to Cinema Website
+                  </Link>
+                </div>
+              )}
               <div className="mt-3 grid grid-cols-2 gap-2 border-t border-border pt-4">
                 <button
                   type="button"
@@ -352,15 +557,66 @@ export default function Navbar() {
                       <div className="min-w-0 flex-1 text-left">
                         <p className="truncate text-sm font-bold text-foreground">{user.name}</p>
                         <p className="truncate text-xs text-muted-foreground">{user.email}</p>
-                        <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-primary">
-                          ⭐ LUMIÈRE VIP Member
-                        </span>
+                        <div className="mt-0.5 flex items-center gap-1.5">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+                            ⭐ VIP Member
+                          </span>
+                          <span className="text-[10px] font-bold text-emerald-400">
+                            • {ticketCount} {ticketCount === 1 ? "Pass" : "Passes"}
+                          </span>
+                        </div>
                       </div>
                     </div>
                     <button
                       type="button"
+                      onClick={() => {
+                        setMobileOpen(false);
+                        if (pathname === "/staff") {
+                          window.dispatchEvent(
+                            new CustomEvent("lumiere-switch-staff-tab", { detail: "passes" })
+                          );
+                        } else {
+                          setBookingsOpen(true);
+                        }
+                      }}
+                      className="mt-2 flex w-full items-center justify-center gap-2 rounded-md border border-primary/40 bg-primary/10 py-2 text-xs font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground"
+                    >
+                      <Ticket className="h-3.5 w-3.5" /> View My Cinema Passes ({ticketCount})
+                    </button>
+                    {user.role === "admin" && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setMobileOpen(false)}
+                        className="mt-1.5 flex w-full items-center justify-center gap-2 rounded-md border border-purple-500/40 bg-purple-500/20 py-2 text-xs font-bold text-purple-300 transition hover:bg-purple-500 hover:text-white"
+                      >
+                        <Crown className="h-3.5 w-3.5" /> Admin Dashboard
+                      </Link>
+                    )}
+                    {user.role === "staff" && (
+                      <>
+                        <Link
+                          to="/staff"
+                          onClick={() => setMobileOpen(false)}
+                          className="mt-1.5 flex w-full items-center justify-center gap-2 rounded-md border border-amber-500/40 bg-amber-500/20 py-2 text-xs font-bold text-amber-300 transition hover:bg-amber-500 hover:text-black"
+                        >
+                          <LayoutDashboard className="h-3.5 w-3.5" /> Staff Operations
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMobileOpen(false);
+                            setScannerOpen(true);
+                          }}
+                          className="mt-1.5 flex w-full items-center justify-center gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 py-2 text-xs font-semibold text-amber-300 transition hover:bg-amber-500 hover:text-black"
+                        >
+                          <ScanLine className="h-3.5 w-3.5" /> Staff Gate Scanner
+                        </button>
+                      </>
+                    )}
+                    <button
+                      type="button"
                       onClick={handleLogout}
-                      className="mt-1 flex items-center justify-center gap-2 rounded-md border border-destructive/40 py-2 text-xs font-semibold text-destructive transition hover:bg-destructive/10"
+                      className="mt-1.5 flex items-center justify-center gap-2 rounded-md border border-destructive/40 py-2 text-xs font-semibold text-destructive transition hover:bg-destructive/10"
                     >
                       <LogOut className="h-3.5 w-3.5" /> Logout
                     </button>
@@ -371,7 +627,14 @@ export default function Navbar() {
                   </Link>
                 )}
 
-                <Link to="/movies" className="btn-gold col-span-2">
+                <Link
+                  to="/movies"
+                  onClick={(e) => {
+                    setMobileOpen(false);
+                    handleBookTicketsNav(e);
+                  }}
+                  className="btn-gold col-span-2"
+                >
                   <Ticket className="h-4 w-4" /> Book Tickets
                 </Link>
               </div>
@@ -384,6 +647,14 @@ export default function Navbar() {
         current={city}
         onSelect={chooseCity}
         onClose={() => setLocOpen(false)}
+      />
+      <MyBookingsDialog
+        open={bookingsOpen}
+        onClose={() => setBookingsOpen(false)}
+      />
+      <StaffScannerDialog
+        open={scannerOpen}
+        onClose={() => setScannerOpen(false)}
       />
     </>
   );

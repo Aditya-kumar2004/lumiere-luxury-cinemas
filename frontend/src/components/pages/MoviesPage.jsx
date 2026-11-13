@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { getRouteApi, useNavigate, Link } from "@tanstack/react-router";
+import { getRouteApi, useNavigate } from "@tanstack/react-router";
 import {
   Search,
   X,
@@ -9,6 +9,7 @@ import {
   Film,
   Calendar,
   RotateCcw,
+  Sparkles,
 } from "lucide-react";
 import PageHeader from "@/components/cine/PageHeader";
 import MovieCard from "@/components/cine/MovieCard";
@@ -54,7 +55,7 @@ export default function MoviesPage() {
     return counts;
   }, [movies]);
 
-  // Overall counts
+  // Overall counts for status tabs
   const stats = useMemo(() => {
     const now = movies.filter((m) => m.status === "now").length;
     const soon = movies.filter((m) => m.status === "soon").length;
@@ -103,46 +104,49 @@ export default function MoviesPage() {
   return (
     <>
       <PageHeader
+        centered
         eyebrow="LUMIÈRE CINEMATHEQUE"
         title="ALL MOVIES"
-        subtitle="Search by title, actor, or genre to find your next big-screen night."
+        subtitle="Explore critically acclaimed premieres, current blockbusters, and upcoming cinematic releases."
         breadcrumbs={[
           { label: "Home", to: "/" },
           { label: "Movies" },
         ]}
       >
-        {/* Long, Full-Width Search Input Box */}
-        <div className="w-full">
-          <div className="relative flex items-center rounded-xl border border-border/80 bg-card/90 shadow-md backdrop-blur-sm transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
-            <Search className="ml-4 h-4.5 w-4.5 shrink-0 text-primary" />
+        {/* Refined Cinema Search Bar */}
+        <div className="w-full max-w-xl">
+          <div className="relative flex items-center rounded-full border border-border/90 bg-card/85 px-4 shadow-lg backdrop-blur-md transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+            <Search className="h-4 w-4 shrink-0 text-primary" />
             <input
               value={q}
               onChange={(e) => update({ q: e.target.value || undefined })}
-              placeholder="Search movies by title, genre, director or star (e.g. Avengers, Nolan, Sci-Fi)..."
+              placeholder="Search movies by title, genre, director or star..."
               aria-label="Search movies"
-              className="h-11.5 w-full bg-transparent px-3 text-sm text-foreground outline-none placeholder:text-muted-foreground"
+              className="h-11 w-full bg-transparent px-3 text-xs sm:text-sm text-foreground outline-none placeholder:text-muted-foreground"
             />
             {q && (
               <button
                 type="button"
                 onClick={() => update({ q: undefined })}
                 aria-label="Clear search"
-                className="mr-2 grid h-7 w-7 place-items-center rounded-md text-muted-foreground transition hover:bg-accent hover:text-foreground"
+                className="grid h-6 w-6 place-items-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground"
               >
-                <X className="h-4 w-4" />
+                <X className="h-3.5 w-3.5" />
               </button>
             )}
           </div>
 
           {/* Quick Search Chips */}
-          <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-            <span className="font-semibold text-primary">Quick Search:</span>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5 text-xs text-muted-foreground">
+            <span className="font-semibold text-primary/90 flex items-center gap-1 text-[11px]">
+              <Sparkles className="h-3 w-3" /> Trending:
+            </span>
             {QUICK_TAGS.map((tag) => (
               <button
                 key={tag}
                 type="button"
                 onClick={() => update({ q: tag })}
-                className="rounded-full border border-border/80 bg-card/60 px-2.5 py-0.5 text-[11px] transition hover:border-primary/50 hover:bg-card hover:text-primary active:scale-95"
+                className="rounded-full border border-border/80 bg-card/60 px-3 py-0.5 text-[11px] font-medium transition hover:border-primary/60 hover:bg-card hover:text-primary active:scale-95"
               >
                 {tag}
               </button>
@@ -151,18 +155,18 @@ export default function MoviesPage() {
         </div>
       </PageHeader>
 
-      {/* Reduced Spacing Container */}
       <div className="container-cine py-6">
-        {/* Simple & Clear Filter Section */}
-        <div className="mb-5 rounded-xl border border-border/80 bg-card/50 p-3.5 backdrop-blur-sm sm:p-4">
+        {/* Clean, Simple & Professional Cinema Discovery Toolbar */}
+        <div className="mb-6 rounded-2xl border border-border/80 bg-card/60 p-3.5 sm:p-4.5 shadow-sm backdrop-blur-md">
+          {/* Row 1: Release Status Segmented Control & Sort Dropdown */}
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            {/* Status Filter Tabs */}
+            {/* Status Filter Tabs (Distinct "All Releases" label prevents duplicate "All Movies") */}
             <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto pb-0.5" role="tablist">
               {[
-                { id: "all", label: "All Movies", count: stats.total, icon: Film },
+                { id: "all", label: "All Releases", count: stats.total, icon: Film },
                 { id: "now", label: "Now Showing", count: stats.now, icon: Flame, pulse: true },
                 { id: "soon", label: "Coming Soon", count: stats.soon, icon: Calendar },
-                { id: "top", label: "Top Rated", count: stats.topRated, icon: Star },
+                { id: "top", label: "Top Rated (8.0+)", count: stats.topRated, icon: Star },
               ].map(({ id, label, count, icon: Icon, pulse }) => {
                 const active = (status || "all") === id;
                 return (
@@ -196,7 +200,7 @@ export default function MoviesPage() {
             </div>
 
             {/* Sort Dropdown */}
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground self-end lg:self-auto">
               <SlidersHorizontal className="h-3.5 w-3.5 text-primary" />
               <span>Sort:</span>
               <select
@@ -212,7 +216,7 @@ export default function MoviesPage() {
             </div>
           </div>
 
-          {/* Genre Filter Pills */}
+          {/* Row 2: Genre Filter Chips (Labeled "All Genres" for clarity) */}
           <div className="mt-3 border-t border-border/60 pt-3">
             <div
               className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1"
@@ -220,22 +224,25 @@ export default function MoviesPage() {
               aria-label="Filter by genre"
             >
               {GENRES.map((g) => {
-                const active = g === (genre || "All Movies");
-                const count = genreCounts[g] ?? 0;
+                const isAll = g === "All Movies";
+                const displayLabel = isAll ? "All Genres" : g;
+                const active = isAll ? !genre || genre === "All Movies" : genre === g;
+                const count = isAll ? stats.total : (genreCounts[g] ?? 0);
+
                 return (
                   <button
                     key={g}
                     type="button"
                     role="tab"
                     aria-selected={active}
-                    onClick={() => update({ genre: g === "All Movies" ? undefined : g })}
+                    onClick={() => update({ genre: isAll ? undefined : g })}
                     className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-all active:scale-95 ${
                       active
                         ? "border-primary bg-primary text-primary-foreground shadow-sm"
                         : "border-border/80 bg-card/60 text-muted-foreground hover:border-primary/40 hover:text-foreground"
                     }`}
                   >
-                    <span>{g}</span>
+                    <span>{displayLabel}</span>
                     <span
                       className={`rounded-full px-1.5 py-0.2 text-[10px] ${
                         active ? "bg-black/20 text-primary-foreground" : "bg-muted text-muted-foreground"
@@ -250,14 +257,14 @@ export default function MoviesPage() {
           </div>
         </div>
 
-        {/* Active Filters Summary */}
+        {/* Active Filters Summary Strip */}
         {hasActiveFilters && (
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-primary/25 bg-primary/5 px-3.5 py-2 text-xs">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-primary/25 bg-primary/5 px-3.5 py-2.5 text-xs">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-bold text-primary">Active:</span>
+              <span className="font-bold text-primary">Active Filters:</span>
               {q && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-card px-2 py-0.5 text-foreground">
-                  "{q}"
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-card px-2.5 py-0.5 text-foreground font-medium shadow-xs">
+                  <span>Search: "{q}"</span>
                   <button
                     type="button"
                     onClick={() => update({ q: undefined })}
@@ -269,8 +276,8 @@ export default function MoviesPage() {
                 </span>
               )}
               {genre && genre !== "All Movies" && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-card px-2 py-0.5 text-foreground">
-                  {genre}
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-card px-2.5 py-0.5 text-foreground font-medium shadow-xs">
+                  <span>Genre: {genre}</span>
                   <button
                     type="button"
                     onClick={() => update({ genre: undefined })}
@@ -282,8 +289,10 @@ export default function MoviesPage() {
                 </span>
               )}
               {status && status !== "all" && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-card px-2 py-0.5 text-foreground">
-                  {status === "now" ? "Now Showing" : status === "soon" ? "Coming Soon" : "Top Rated"}
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-card px-2.5 py-0.5 text-foreground font-medium shadow-xs">
+                  <span>
+                    Status: {status === "now" ? "Now Showing" : status === "soon" ? "Coming Soon" : "Top Rated"}
+                  </span>
                   <button
                     type="button"
                     onClick={() => update({ status: undefined })}
@@ -298,14 +307,14 @@ export default function MoviesPage() {
 
             <div className="flex items-center gap-3">
               <span className="text-muted-foreground">
-                Showing <strong className="text-foreground">{filteredMovies.length}</strong> of {movies.length}
+                Showing <strong className="text-foreground">{filteredMovies.length}</strong> of {movies.length} films
               </span>
               <button
                 type="button"
                 onClick={clearAllFilters}
-                className="inline-flex items-center gap-1 font-semibold text-primary transition hover:underline"
+                className="inline-flex items-center gap-1 rounded-md px-2 py-1 font-semibold text-primary transition hover:bg-primary/10"
               >
-                <RotateCcw className="h-3 w-3" /> Reset
+                <RotateCcw className="h-3 w-3" /> Reset All
               </button>
             </div>
           </div>
@@ -313,18 +322,18 @@ export default function MoviesPage() {
 
         {/* Movie Results */}
         {filteredMovies.length === 0 ? (
-          <div className="my-8 grid place-items-center rounded-xl border border-dashed border-border bg-card/40 px-6 py-14 text-center">
+          <div className="my-8 grid place-items-center rounded-2xl border border-dashed border-border bg-card/40 px-6 py-14 text-center">
             <Film className="mb-3 h-8 w-8 text-primary" />
             <h3 className="font-display text-2xl tracking-wide text-foreground">
               No matching movies found
             </h3>
             <p className="mt-1 text-xs text-muted-foreground">
-              Try adjusting your search or filter options.
+              Try adjusting your search query or selecting a different genre.
             </p>
             <button
               type="button"
               onClick={clearAllFilters}
-              className="btn-gold mt-4 !py-2 !text-xs"
+              className="btn-gold mt-4 !py-2 !text-xs font-bold"
             >
               <RotateCcw className="h-3.5 w-3.5" /> Clear Filters
             </button>
