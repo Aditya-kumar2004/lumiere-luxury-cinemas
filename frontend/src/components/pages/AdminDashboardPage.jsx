@@ -31,6 +31,7 @@ import {
   History,
 } from "lucide-react";
 import { toast } from "sonner";
+import { API_BASE_URL } from "@/config";
 
 export default function AdminDashboardPage() {
   const navigate = useNavigate();
@@ -127,7 +128,7 @@ export default function AdminDashboardPage() {
 
     try {
       // 1. Overview KPIs
-      const overviewRes = await fetch("http://localhost:5000/api/admin/overview", {
+      const overviewRes = await fetch(`${API_BASE_URL}/api/admin/overview`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const overviewData = await overviewRes.json();
@@ -137,7 +138,7 @@ export default function AdminDashboardPage() {
 
       // 2. Users directory
       const usersRes = await fetch(
-        `http://localhost:5000/api/admin/users?search=${encodeURIComponent(
+        `${API_BASE_URL}/api/admin/users?search=${encodeURIComponent(
           userSearchQuery
         )}&role=${encodeURIComponent(roleFilter)}`,
         {
@@ -160,7 +161,7 @@ export default function AdminDashboardPage() {
 
     try {
       const moviesRes = await fetch(
-        `http://localhost:5000/api/admin/movies?search=${encodeURIComponent(
+        `${API_BASE_URL}/api/admin/movies?search=${encodeURIComponent(
           movieSearchQuery
         )}&status=${encodeURIComponent(movieStatusFilter)}`,
         {
@@ -182,7 +183,7 @@ export default function AdminDashboardPage() {
     if (!token) return;
     setLoadingLogs(true);
     try {
-      const res = await fetch("http://localhost:5000/api/admin/logs?limit=100", {
+      const res = await fetch(`${API_BASE_URL}/api/admin/logs?limit=100`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -203,7 +204,7 @@ export default function AdminDashboardPage() {
     const token = window.localStorage.getItem("lumiere-token");
     if (!token) return;
     try {
-      const res = await fetch("http://localhost:5000/api/admin/logs", {
+      const res = await fetch(`${API_BASE_URL}/api/admin/logs`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -287,7 +288,7 @@ export default function AdminDashboardPage() {
 
     setUpdatingUserId(userId);
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/users/${userId}/role`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/role`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -428,7 +429,7 @@ export default function AdminDashboardPage() {
       let finalPosterUrl = movieForm.poster_url;
       if (posterPreview?.dataUrl && posterPreview.dataUrl.startsWith("data:image/")) {
         try {
-          const uploadRes = await fetch("http://localhost:5000/api/admin/upload-image", {
+          const uploadRes = await fetch(`${API_BASE_URL}/api/admin/upload-image`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -452,7 +453,7 @@ export default function AdminDashboardPage() {
       let finalBannerUrl = movieForm.banner_url;
       if (bannerPreview?.dataUrl && bannerPreview.dataUrl.startsWith("data:image/")) {
         try {
-          const uploadRes = await fetch("http://localhost:5000/api/admin/upload-image", {
+          const uploadRes = await fetch(`${API_BASE_URL}/api/admin/upload-image`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -473,7 +474,7 @@ export default function AdminDashboardPage() {
         }
       }
 
-      const res = await fetch("http://localhost:5000/api/admin/movies", {
+      const res = await fetch(`${API_BASE_URL}/api/admin/movies`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -530,7 +531,7 @@ export default function AdminDashboardPage() {
       let finalPosterUrl = movieForm.poster_url;
       if (posterPreview?.dataUrl && posterPreview.dataUrl.startsWith("data:image/")) {
         try {
-          const uploadRes = await fetch("http://localhost:5000/api/admin/upload-image", {
+          const uploadRes = await fetch(`${API_BASE_URL}/api/admin/upload-image`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -554,7 +555,7 @@ export default function AdminDashboardPage() {
       let finalBannerUrl = movieForm.banner_url;
       if (bannerPreview?.dataUrl && bannerPreview.dataUrl.startsWith("data:image/")) {
         try {
-          const uploadRes = await fetch("http://localhost:5000/api/admin/upload-image", {
+          const uploadRes = await fetch(`${API_BASE_URL}/api/admin/upload-image`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -575,7 +576,7 @@ export default function AdminDashboardPage() {
         }
       }
 
-      const res = await fetch(`http://localhost:5000/api/admin/movies/${editingMovie.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/movies/${editingMovie.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -621,7 +622,7 @@ export default function AdminDashboardPage() {
 
     setSubmittingMovie(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/movies/${deletingMovie.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/movies/${deletingMovie.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

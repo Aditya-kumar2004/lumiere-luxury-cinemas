@@ -73,8 +73,12 @@ app.get("/api/db-test", async function (req, res) {
 
 // Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, async function () {
-  console.log("Server is running on port " + PORT);
-  // Auto-check tables on server start
-  await setupTables();
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(PORT, async function () {
+    console.log("Server is running on port " + PORT);
+    // Auto-check tables on server start
+    await setupTables();
+  });
+}
+
+module.exports = app;

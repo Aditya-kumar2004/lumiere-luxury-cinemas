@@ -1,6 +1,7 @@
 import { MOVIES, FEATURED } from "@/data/movies";
+import { API_BASE_URL } from "@/config";
 
-const BACKEND_URL = "http://localhost:5000/api";
+const BACKEND_URL = `${API_BASE_URL}/api`;
 
 // Map static metadata so bundled HD poster assets and rich defaults are retained
 const STATIC_MAP = new Map(MOVIES.map((m) => [m.id, m]));

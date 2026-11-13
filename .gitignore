@@ -17,6 +17,10 @@ frontend/.env.*
 dist/
 frontend/dist/
 build/
+.output/
+frontend/.output/
+.vercel/
+frontend/.vercel/
 
 # Logs
 *.log

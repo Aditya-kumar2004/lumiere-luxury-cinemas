@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 import QRCode from "qrcode";
 import { SHOWTIMES, CINEMAS } from "@/data/movies";
+import { API_BASE_URL } from "@/config";
 
 const ROWS = ["A", "B", "C", "D", "E", "F", "G", "H"];
 const COLS = 12;
@@ -88,7 +89,7 @@ export default function BookingPage() {
     async function fetchOccupied() {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/bookings/occupied?movieTitle=${encodeURIComponent(
+          `${API_BASE_URL}/api/bookings/occupied?movieTitle=${encodeURIComponent(
             movie.title
           )}&cinemaName=${encodeURIComponent(cinema)}&showTime=${encodeURIComponent(time)}&showDate=${today}`
         );
@@ -194,7 +195,7 @@ export default function BookingPage() {
     setIsBooking(true);
     try {
       const token = window.localStorage.getItem("lumiere-token");
-      const res = await fetch("http://localhost:5000/api/bookings", {
+      const res = await fetch(`${API_BASE_URL}/api/bookings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -285,7 +286,7 @@ export default function BookingPage() {
     toast.info("Downloading official PDF Cinema Pass...");
     try {
       const res = await fetch(
-        `http://localhost:5000/api/bookings/${confirmedBooking.id || 1}/pdf`,
+        `${API_BASE_URL}/api/bookings/${confirmedBooking.id || 1}/pdf`,
         {
           headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         }

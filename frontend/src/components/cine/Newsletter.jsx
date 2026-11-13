@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Mail, Send, Lock, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 import Reveal from "./Reveal";
+import { API_BASE_URL } from "../../config";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -41,7 +42,7 @@ export default function Newsletter() {
     setBusy(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/newsletter/subscribe", {
+      const response = await fetch(`${API_BASE_URL}/api/newsletter/subscribe`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: cleanEmail }),

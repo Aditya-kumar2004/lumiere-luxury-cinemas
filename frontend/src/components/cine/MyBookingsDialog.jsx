@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import QRCode from "qrcode";
+import { API_BASE_URL } from "@/config";
 
 export default function MyBookingsDialog({ open, onClose }) {
   const [bookings, setBookings] = useState([]);
@@ -29,7 +30,7 @@ export default function MyBookingsDialog({ open, onClose }) {
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/bookings/my-bookings", {
+      const res = await fetch(`${API_BASE_URL}/api/bookings/my-bookings`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -80,7 +81,7 @@ export default function MyBookingsDialog({ open, onClose }) {
 
     toast.info("Generating your official PDF ticket pass...");
     try {
-      const res = await fetch(`http://localhost:5000/api/bookings/${booking.id}/pdf`, {
+      const res = await fetch(`${API_BASE_URL}/api/bookings/${booking.id}/pdf`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
@@ -112,7 +113,7 @@ export default function MyBookingsDialog({ open, onClose }) {
     setCancellingId(confirmCancelBooking.id);
     try {
       const res = await fetch(
-        `http://localhost:5000/api/bookings/${confirmCancelBooking.id}/cancel`,
+        `${API_BASE_URL}/api/bookings/${confirmCancelBooking.id}/cancel`,
         {
           method: "PUT",
           headers: { Authorization: `Bearer ${token}` },

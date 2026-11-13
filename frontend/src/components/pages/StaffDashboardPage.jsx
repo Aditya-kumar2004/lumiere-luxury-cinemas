@@ -28,6 +28,7 @@ import {
 import { toast } from "sonner";
 import QRCode from "qrcode";
 import StaffScannerDialog from "@/components/cine/StaffScannerDialog";
+import { API_BASE_URL } from "@/config";
 
 export default function StaffDashboardPage() {
   const navigate = useNavigate();
@@ -114,7 +115,7 @@ export default function StaffDashboardPage() {
     if (!token) return;
 
     try {
-      const res = await fetch("http://localhost:5000/api/bookings/my-bookings", {
+      const res = await fetch(`${API_BASE_URL}/api/bookings/my-bookings`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -153,7 +154,7 @@ export default function StaffDashboardPage() {
     setLoading(true);
     try {
       // 1. Overview metrics
-      const overviewRes = await fetch("http://localhost:5000/api/staff/overview", {
+      const overviewRes = await fetch(`${API_BASE_URL}/api/staff/overview`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const overviewData = await overviewRes.json();
@@ -164,7 +165,7 @@ export default function StaffDashboardPage() {
 
       // 2. Bookings list
       const bookingsRes = await fetch(
-        `http://localhost:5000/api/staff/bookings?search=${encodeURIComponent(
+        `${API_BASE_URL}/api/staff/bookings?search=${encodeURIComponent(
           searchQuery
         )}&status=${encodeURIComponent(statusFilter)}&movie=${encodeURIComponent(selectedMovie)}`,
         {
@@ -213,7 +214,7 @@ export default function StaffDashboardPage() {
 
     toast.info("Generating your official PDF ticket pass...");
     try {
-      const res = await fetch(`http://localhost:5000/api/bookings/${booking.id}/pdf`, {
+      const res = await fetch(`${API_BASE_URL}/api/bookings/${booking.id}/pdf`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
@@ -245,7 +246,7 @@ export default function StaffDashboardPage() {
     setCancellingBookingId(confirmCancelBooking.id);
     try {
       const res = await fetch(
-        `http://localhost:5000/api/bookings/${confirmCancelBooking.id}/cancel`,
+        `${API_BASE_URL}/api/bookings/${confirmCancelBooking.id}/cancel`,
         {
           method: "PUT",
           headers: { Authorization: `Bearer ${token}` },
@@ -287,7 +288,7 @@ export default function StaffDashboardPage() {
 
     setAdmittingCode(bookingCode);
     try {
-      const res = await fetch(`http://localhost:5000/api/staff/admit/${bookingCode}`, {
+      const res = await fetch(`${API_BASE_URL}/api/staff/admit/${bookingCode}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -327,7 +328,7 @@ export default function StaffDashboardPage() {
     setIsScanning(true);
     setScanResult(null);
     try {
-      const res = await fetch(`http://localhost:5000/api/bookings/verify/${cleanCode}`);
+      const res = await fetch(`${API_BASE_URL}/api/bookings/verify/${cleanCode}`);
       const data = await res.json();
       setScanResult(data);
       if (data.valid) {

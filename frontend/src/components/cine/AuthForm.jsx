@@ -30,6 +30,7 @@ import featuredBanner from "@/assets/featured-banner.jpg";
 import Logo from "./Logo";
 import { useTheme } from "@/hooks/useTheme";
 import { CITIES } from "@/data/movies";
+import { API_BASE_URL } from "@/config";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -237,7 +238,7 @@ export default function AuthForm({ mode }) {
     if (isLogin) {
       // Login API call
       try {
-        const res = await fetch("http://localhost:5000/api/auth/login", {
+        const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: form.email, password: form.password }),
@@ -270,7 +271,7 @@ export default function AuthForm({ mode }) {
     } else {
       // Register API Call -> Triggers 8-Digit OTP Email
       try {
-        const res = await fetch("http://localhost:5000/api/auth/register", {
+        const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(form),
@@ -309,7 +310,7 @@ export default function AuthForm({ mode }) {
     setOtpError("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/verify-otp", {
+      const res = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: form.email, otp: otp.trim() }),
@@ -351,7 +352,7 @@ export default function AuthForm({ mode }) {
     if (resendTimer > 0) return;
     setResendTimer(60);
     try {
-      await fetch("http://localhost:5000/api/auth/resend-otp", {
+      await fetch(`${API_BASE_URL}/api/auth/resend-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: form.email }),

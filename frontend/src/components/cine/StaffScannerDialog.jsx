@@ -9,6 +9,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
+import { API_BASE_URL } from "../../config";
 
 export default function StaffScannerDialog({ open, onClose }) {
   const [code, setCode] = useState("");
@@ -26,7 +27,7 @@ export default function StaffScannerDialog({ open, onClose }) {
     setResult(null);
 
     try {
-      const res = await fetch(`http://localhost:5000/api/bookings/verify/${searchCode}`);
+      const res = await fetch(`${API_BASE_URL}/api/bookings/verify/${searchCode}`);
       const data = await res.json();
       setResult(data);
       if (data.valid) {
