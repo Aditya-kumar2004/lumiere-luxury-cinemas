@@ -775,13 +775,13 @@ export default function AdminDashboardPage() {
               setActiveTab("users");
               setRoleFilter("staff");
             }}
-            className="cursor-pointer rounded-xl border border-amber-500/30 bg-card p-4 shadow-sm transition hover:border-amber-500"
+            className="cursor-pointer rounded-xl border border-emerald-500/30 bg-card p-4 shadow-sm transition hover:border-emerald-500"
           >
-            <div className="flex items-center justify-between text-amber-600 dark:text-amber-400">
+            <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400">
               <span className="text-xs font-semibold uppercase tracking-wider">Staff Team</span>
-              <UserCheck className="h-4 w-4 text-amber-500" />
+              <UserCheck className="h-4 w-4 text-emerald-500" />
             </div>
-            <p className="mt-2 text-2xl font-bold text-amber-600 dark:text-amber-400">
+            <p className="mt-2 text-2xl font-bold text-emerald-600 dark:text-emerald-400">
               {stats.totalStaff}
             </p>
             <span className="text-xs text-muted-foreground">Gate & hall operators</span>
@@ -1041,8 +1041,8 @@ export default function AdminDashboardPage() {
                                   NOW SHOWING
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[11px] font-bold text-amber-500">
-                                  <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                                <span className="inline-flex items-center gap-1 rounded-md border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[11px] font-bold text-rose-500">
+                                  <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
                                   COMING SOON
                                 </span>
                               )}
@@ -1058,8 +1058,8 @@ export default function AdminDashboardPage() {
 
                             {/* Rating */}
                             <td className="py-3 px-3">
-                              <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 font-bold text-amber-600 dark:text-amber-400">
-                                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                              <span className="inline-flex items-center gap-1 rounded-md bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 font-bold text-rose-600 dark:text-rose-400">
+                                <Star className="h-3 w-3 fill-rose-500 text-rose-500" />
                                 {Number(m.rating || 8.0).toFixed(1)}
                               </span>
                             </td>
@@ -1281,8 +1281,8 @@ export default function AdminDashboardPage() {
                                 </span>
                               )}
                               {role === "staff" && (
-                                <span className="inline-flex items-center gap-1 rounded-md border border-amber-500/30 bg-amber-500/15 px-2 py-0.5 text-[11px] font-bold text-amber-600 dark:text-amber-400">
-                                  <UserCheck className="h-3 w-3 text-amber-500" /> Staff
+                                <span className="inline-flex items-center gap-1 rounded-md border border-emerald-500/30 bg-emerald-500/15 px-2 py-0.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                                  <UserCheck className="h-3 w-3 text-emerald-500" /> Staff
                                 </span>
                               )}
                               {role !== "admin" && role !== "staff" && (
@@ -1499,12 +1499,12 @@ export default function AdminDashboardPage() {
                 <span className="text-[11px] text-muted-foreground">Catalog additions</span>
               </div>
 
-              <div className="rounded-xl border border-amber-500/30 bg-card p-3.5 shadow-sm">
-                <div className="flex items-center justify-between text-amber-600 dark:text-amber-400">
+              <div className="rounded-xl border border-sky-500/30 bg-card p-3.5 shadow-sm">
+                <div className="flex items-center justify-between text-sky-600 dark:text-sky-400">
                   <span className="text-xs font-semibold uppercase tracking-wider">Movies Updated</span>
-                  <Edit2 className="h-4 w-4 text-amber-500" />
+                  <Edit2 className="h-4 w-4 text-sky-500" />
                 </div>
-                <p className="mt-2 text-2xl font-bold text-amber-600 dark:text-amber-400">{logStats.updated}</p>
+                <p className="mt-2 text-2xl font-bold text-sky-600 dark:text-sky-400">{logStats.updated}</p>
                 <span className="text-[11px] text-muted-foreground">Information revisions</span>
               </div>
 
@@ -1591,7 +1591,7 @@ export default function AdminDashboardPage() {
                               </span>
                             )}
                             {isUpdated && (
-                              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/15 px-2.5 py-0.5 text-[11px] font-bold text-amber-600 dark:text-amber-400">
+                              <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-500/40 bg-sky-500/15 px-2.5 py-0.5 text-[11px] font-bold text-sky-600 dark:text-sky-400">
                                 <Edit2 className="h-3 w-3" /> Movie Updated
                               </span>
                             )}

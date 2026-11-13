@@ -40,14 +40,13 @@ export default function CinemaExperience() {
         <img
           src={cinemaExpBg}
           alt="LUMIÈRE Luxury Cinema Experience"
-          className="h-full w-full object-cover object-center"
+          className="h-full w-full object-cover object-center brightness-120 contrast-[1.04] saturate-[1.08]"
         />
       </div>
 
-      {/* Subtle Vignettes from Hero Section (NO milky white fog, NO heavy black veil) */}
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-overlay-left opacity-90" />
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-overlay-bottom opacity-80" />
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-black/40 via-transparent to-black/50" />
+      {/* Subtle Vignettes from Hero Section (clean, luminous, clear) */}
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-overlay-left opacity-40" />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-overlay-bottom opacity-35" />
 
       <Reveal className="container-cine relative z-10">
         {/* Section Heading with High-Legibility Cinema Drop Shadows */}

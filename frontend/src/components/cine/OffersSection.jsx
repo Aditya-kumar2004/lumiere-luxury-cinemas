@@ -60,7 +60,7 @@ export default function OffersSection() {
               {o.tag}
             </span>
             <h3
-              className={`font-display tracking-wide text-amber-400 ${o.big ? "text-4xl xs:text-5xl sm:text-7xl" : "text-3xl sm:text-4xl"}`}
+              className={`font-display tracking-wide text-emerald-400 ${o.big ? "text-4xl xs:text-5xl sm:text-7xl" : "text-3xl sm:text-4xl"}`}
             >
               {o.title}
             </h3>
@@ -73,7 +73,7 @@ export default function OffersSection() {
                   description: "Offer applied automatically at checkout when eligible.",
                 })
               }
-              className="mt-5 inline-flex w-fit items-center gap-1.5 text-sm font-bold text-amber-400 transition group-hover:gap-3 hover:text-amber-300"
+              className="mt-5 inline-flex w-fit items-center gap-1.5 text-sm font-bold text-emerald-400 transition group-hover:gap-3 hover:text-emerald-300"
             >
               Explore Offer <ArrowRight className="h-4 w-4" />
             </button>

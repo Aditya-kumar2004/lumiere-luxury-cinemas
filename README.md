@@ -29,7 +29,7 @@
 
 ## 🌟 Project Overview
 
-**LUMIÈRE** is a production-ready, full-stack luxury cinema reservation and theater management platform. Designed with an ultra-premium obsidian-black and gold aesthetic (*Cinzel* & *Plus Jakarta Sans* typography), it delivers a seamless end-to-end experience for moviegoers, gatekeeper cinema staff, and system administrators.
+**LUMIÈRE** is a production-ready, full-stack luxury cinema reservation and theater management platform. Designed with an ultra-premium obsidian-black, Cinema Crimson Red, and Emerald Green aesthetic (*Cinzel* Roman serif & *Plus Jakarta Sans* typography), it delivers a seamless end-to-end experience for moviegoers, gatekeeper cinema staff, and system administrators.
 
 From interactive SVG/2D seat selection and instant PDF pass generation with cryptographic QR codes to real-time gate admission scanning and automated audit logging, LUMIÈRE demonstrates enterprise-grade software architecture, secure database transactions, and scalable frontend engineering.
 
@@ -85,7 +85,7 @@ From interactive SVG/2D seat selection and instant PDF pass generation with cryp
 ## 🚀 Technical Highlights & Engineering Decisions
 
 * **⚡ Modern React 19 & TanStack Router**: Type-safe client-side routing, route loaders, and SSR-ready code splitting for lightning-fast page transitions without full-page reloads.
-* **🎨 Custom Luxury Design System**: Engineered with Tailwind CSS v4, featuring glassmorphism surfaces (`backdrop-blur`), gold radiant glows, and responsive typography (*Cinzel* Roman display serif + *Plus Jakarta Sans* UI body).
+* **🎨 Custom Luxury Design System**: Engineered with Tailwind CSS v4, featuring glassmorphism surfaces (`backdrop-blur`), vibrant Crimson & Emerald glowing accents, and responsive typography (*Cinzel* Roman display serif + *Plus Jakarta Sans* UI body).
 * **🪑 Dynamic Seat Collision & Matrix Engine**: Responsive 2D grid that renders reserved, available, and selected states dynamically, enforcing multi-seat reservation limits and tier-based pricing.
 * **📷 Integrated QR Code Ecosystem**: Dual-sided QR implementation — generated client-side upon reservation confirmation, and parsed via staff webcams using high-performance optical decoding algorithms.
 * **📧 Automated Transactional Email Dispatcher**: Integrated Nodemailer engine delivering custom-styled HTML luxury boarding passes straight to customer inboxes upon booking confirmation.

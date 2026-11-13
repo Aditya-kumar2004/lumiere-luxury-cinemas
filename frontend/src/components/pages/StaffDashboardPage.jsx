@@ -1186,10 +1186,10 @@ export default function StaffDashboardPage() {
                 </div>
               ) : (
                 /* INVALID / NOT FOUND */
-                <div className="rounded-xl border-2 border-amber-500 bg-amber-500/10 p-6 text-center space-y-4">
-                  <AlertTriangle className="mx-auto h-14 w-14 text-amber-500" />
+                <div className="rounded-xl border-2 border-rose-500 bg-rose-500/10 p-6 text-center space-y-4">
+                  <AlertTriangle className="mx-auto h-14 w-14 text-rose-500" />
                   <div>
-                    <h3 className="text-xl font-bold text-amber-600 dark:text-amber-400">
+                    <h3 className="text-xl font-bold text-rose-600 dark:text-rose-400">
                       ❌ INVALID TICKET CODE
                     </h3>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -1224,7 +1224,7 @@ export default function StaffDashboardPage() {
                   <span className="h-3 w-3 rounded-full bg-rose-500 inline-block" /> Occupied
                 </span>
                 <span className="flex items-center gap-1.5 text-muted-foreground">
-                  <span className="h-3 w-3 rounded-full bg-amber-500 inline-block" /> Void / Cancelled
+                  <span className="h-3 w-3 rounded-full bg-rose-500/40 inline-block" /> Void / Cancelled
                 </span>
               </div>
             </div>
@@ -1276,7 +1276,7 @@ export default function StaffDashboardPage() {
                               occupancyPercent > 80
                                 ? "bg-rose-500"
                                 : occupancyPercent > 50
-                                ? "bg-amber-500"
+                                ? "bg-rose-400"
                                 : "bg-emerald-500"
                             }`}
                             style={{ width: `${Math.max(4, occupancyPercent)}%` }}
@@ -1544,7 +1544,7 @@ export default function StaffDashboardPage() {
                           seatColor = "bg-rose-500 border-rose-600 text-white font-bold";
                           statusLabel = "Occupied";
                         } else if (isCancelled) {
-                          seatColor = "bg-amber-500/20 border-amber-500/40 text-amber-600 dark:text-amber-400 line-through";
+                          seatColor = "bg-rose-950/40 border-rose-500/40 text-rose-400 line-through";
                           statusLabel = "Void / Released";
                         }
 
@@ -1577,7 +1577,7 @@ export default function StaffDashboardPage() {
                   <span className="h-3 w-3 rounded bg-rose-500 border border-rose-600 inline-block" /> Occupied ({selectedHallMovie.seatsBooked || 0})
                 </span>
                 <span className="flex items-center gap-1.5 text-muted-foreground">
-                  <span className="h-3 w-3 rounded bg-amber-500/20 border border-amber-500 inline-block" /> Void / Freed
+                  <span className="h-3 w-3 rounded bg-rose-950/40 border border-rose-500/50 inline-block" /> Void / Freed
                 </span>
               </div>
 

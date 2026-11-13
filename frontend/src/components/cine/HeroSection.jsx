@@ -11,6 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import heroAvengersEndgame from "@/assets/hero-avengers-endgame.jpg";
 import heroTheatre from "@/assets/hero-theatre.jpg";
 import heroImax from "@/assets/hero-imax.jpg";
 import heroVip from "@/assets/hero-vip-lounge.jpg";
@@ -25,6 +26,13 @@ const HIGHLIGHTS = [
 ];
 
 const SLIDES = [
+  {
+    id: "endgame",
+    image: heroAvengersEndgame,
+    badge: "AVENGERS: ENDGAME • IMAX® 3D",
+    hall: "IMAX Laser Auditorium",
+    tech: "Curved 4K Laser 3D",
+  },
   {
     id: "imax",
     image: heroImax,
@@ -102,7 +110,7 @@ export default function HeroSection() {
                 alt={slide.badge}
                 width={1920}
                 height={1088}
-                className="h-full w-full object-cover object-center"
+                className="h-full w-full object-cover object-center brightness-125 contrast-[1.04] saturate-[1.08]"
               />
             </div>
           ))}
@@ -110,8 +118,8 @@ export default function HeroSection() {
       </div>
 
       {/* Clean, Subtle Contrast Vignette (no edge blur, no heavy black fog) */}
-      <div className="absolute inset-0 -z-10 bg-overlay-left" />
-      <div className="absolute inset-0 -z-10 bg-overlay-bottom" />
+      <div className="absolute inset-0 -z-10 bg-overlay-left opacity-60" />
+      <div className="absolute inset-0 -z-10 bg-overlay-bottom opacity-40" />
 
       {/* Hero Content */}
       <div className="container-cine grid items-center gap-12 lg:grid-cols-[1.15fr_1fr]">
@@ -127,7 +135,7 @@ export default function HeroSection() {
           <h1 className="font-display text-2xl xs:text-3xl sm:text-4xl lg:text-[2.75rem] xl:text-[3.25rem] font-bold tracking-wide text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)] leading-[1.15]">
             Experience movies
             <br />
-            <span className="text-primary">like never before.</span>
+            <span className="text-[#ff3847] drop-shadow-[0_2px_14px_rgba(255,56,71,0.55)]">like never before.</span>
           </h1>
 
           <p className="mt-4 max-w-lg text-sm leading-relaxed text-zinc-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)] sm:text-base">
@@ -214,17 +222,20 @@ export default function HeroSection() {
         </div>
 
         {/* Featured movie card (clean, sharp luxury glass panel) */}
-        <div className="relative hidden animate-fade-up [animation-delay:250ms] md:block">
-          <div className="overflow-hidden rounded-xl border border-white/15 bg-zinc-950/85 text-white shadow-2xl backdrop-blur-md transition-all duration-300 hover:border-primary/50">
+        <Link
+          to={`/book/${FEATURED.id}`}
+          className="relative hidden animate-fade-up [animation-delay:250ms] md:block group cursor-pointer"
+        >
+          <div className="overflow-hidden rounded-xl border border-white/15 bg-zinc-950/85 text-white shadow-2xl backdrop-blur-md transition-all duration-300 group-hover:border-primary/60 group-hover:shadow-[0_10px_35px_rgba(229,9,20,0.25)]">
             <div className="relative aspect-[16/9] overflow-hidden">
               <img
                 src={FEATURED.backdrop}
                 alt={FEATURED.title}
                 width={1920}
                 height={832}
-                className="h-full w-full object-cover transition duration-700 hover:scale-105"
+                className="h-full w-full object-cover brightness-115 contrast-[1.02] saturate-[1.08] transition duration-700 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
               <span className="absolute left-4 top-4 rounded-sm bg-primary px-2 py-1 text-[10px] font-extrabold tracking-widest text-primary-foreground">
                 FEATURED
               </span>
@@ -240,13 +251,13 @@ export default function HeroSection() {
                 <span className="h-1 w-1 rounded-full bg-zinc-600" />
                 <span>{FEATURED.duration}</span>
               </div>
-              <h3 className="mt-2.5 font-display text-2xl sm:text-3xl tracking-wide text-white">
+              <h3 className="mt-2.5 font-display text-2xl sm:text-3xl tracking-wide text-white group-hover:text-primary transition-colors">
                 {FEATURED.title}
               </h3>
               <p className="mt-2 line-clamp-2 text-sm text-zinc-300">{FEATURED.description}</p>
             </div>
           </div>
-        </div>
+        </Link>
       </div>
 
       <TrailerDialog

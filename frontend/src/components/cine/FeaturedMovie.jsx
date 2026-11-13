@@ -33,9 +33,9 @@ export default function FeaturedMovie({ movie = FEATURED }) {
           loading="lazy"
           width={1920}
           height={832}
-          className="absolute inset-0 -z-10 h-full w-full object-cover object-right transition-transform duration-[1500ms] group-hover:scale-105"
+          className="absolute inset-0 -z-10 h-full w-full object-cover object-right brightness-125 contrast-[1.04] saturate-[1.10] transition-transform duration-[1500ms] group-hover:scale-105"
         />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/95 via-black/80 to-transparent" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/55 via-black/25 to-transparent" />
         <div className="max-w-xl px-5 py-10 xs:px-6 xs:py-12 sm:px-12 sm:py-20 lg:py-24">
           <p className="mb-3 text-xs font-bold tracking-[0.3em] text-primary">FEATURED PREMIERE</p>
           <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-bold tracking-wide text-white">

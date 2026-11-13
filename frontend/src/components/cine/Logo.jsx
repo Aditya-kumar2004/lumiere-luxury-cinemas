@@ -10,24 +10,24 @@ export function CinemaEmblem({ className = "h-9 w-9", glow = true }) {
         viewBox="0 0 64 64"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="relative h-full w-full drop-shadow-[0_2px_8px_rgba(245,158,11,0.25)]"
+        className="relative h-full w-full drop-shadow-[0_2px_8px_rgba(229,9,20,0.35)]"
       >
         <defs>
           <linearGradient
-            id="logoGold"
+            id="logoCrimson"
             x1="8"
             y1="8"
             x2="56"
             y2="56"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0%" stopColor="#FDE047" />
-            <stop offset="35%" stopColor="#F59E0B" />
-            <stop offset="70%" stopColor="#D97706" />
-            <stop offset="100%" stopColor="#92400E" />
+            <stop offset="0%" stopColor="#ff4d4d" />
+            <stop offset="35%" stopColor="#ef4444" />
+            <stop offset="70%" stopColor="#dc2626" />
+            <stop offset="100%" stopColor="#991b1b" />
           </linearGradient>
           <radialGradient id="logoRadial" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#FDE047" stopOpacity="0.3" />
+            <stop offset="0%" stopColor="#ff4d4d" stopOpacity="0.3" />
             <stop offset="100%" stopColor="#0B0D13" stopOpacity="0" />
           </radialGradient>
         </defs>
@@ -40,16 +40,16 @@ export function CinemaEmblem({ className = "h-9 w-9", glow = true }) {
           y="2"
           rx="14"
           fill="#0B0D13"
-          stroke="url(#logoGold)"
+          stroke="url(#logoCrimson)"
           strokeWidth="1.5"
-          className="transition duration-300 group-hover:stroke-amber-300"
+          className="transition duration-300 group-hover:stroke-red-400"
         />
         <circle cx="32" cy="32" r="22" fill="url(#logoRadial)" />
 
         {/* Outer Faceted Diamond */}
         <path
           d="M32 11 L51 32 L32 53 L13 32 Z"
-          stroke="url(#logoGold)"
+          stroke="url(#logoCrimson)"
           strokeWidth="2"
           strokeLinejoin="round"
         />
@@ -57,7 +57,7 @@ export function CinemaEmblem({ className = "h-9 w-9", glow = true }) {
         {/* Inner Diamond Shimmer */}
         <path
           d="M32 17 L45 32 L32 47 L19 32 Z"
-          stroke="url(#logoGold)"
+          stroke="url(#logoCrimson)"
           strokeWidth="1"
           strokeOpacity="0.55"
           strokeLinejoin="round"
@@ -66,7 +66,7 @@ export function CinemaEmblem({ className = "h-9 w-9", glow = true }) {
         {/* Cinematic Monogram "L" */}
         <path
           d="M26 21 V41 H38"
-          stroke="url(#logoGold)"
+          stroke="url(#logoCrimson)"
           strokeWidth="3.2"
           strokeLinecap="round"
           strokeLinejoin="round"

@@ -490,7 +490,7 @@ export default function AuthForm({ mode }) {
               className="grid h-9 w-9 place-items-center rounded-lg border border-border bg-card/80 text-foreground transition hover:border-primary hover:text-primary active:scale-95"
             >
               {isDark ? (
-                <Sun className="h-4 w-4 text-amber-400" />
+                <Sun className="h-4 w-4 text-emerald-400" />
               ) : (
                 <Moon className="h-4 w-4 text-primary" />
               )}

@@ -406,12 +406,12 @@ export default function BookingPage() {
                               i === 5 ? "mr-4" : ""
                             } ${
                               taken
-                                ? "cursor-not-allowed bg-accent/50 text-transparent"
+                                ? "cursor-not-allowed bg-red-950/50 border border-red-500/30 text-red-500/40 line-through"
                                 : sel
-                                ? "bg-primary text-primary-foreground font-black shadow-md scale-105"
+                                ? "bg-emerald-500 text-white font-black shadow-md shadow-emerald-500/40 scale-105 border border-emerald-400"
                                 : ["G", "H"].includes(r)
-                                ? "border border-primary/50 bg-card text-muted-foreground hover:bg-primary/30"
-                                : "border border-border bg-card text-muted-foreground hover:border-primary"
+                                ? "border border-red-500/50 bg-card text-zinc-300 hover:bg-red-500/20 hover:border-red-500"
+                                : "border border-emerald-500/30 bg-card text-zinc-300 hover:border-emerald-500 hover:bg-emerald-500/15"
                             }`}
                           >
                             {i + 1}
@@ -424,18 +424,16 @@ export default function BookingPage() {
               </div>
               <div className="mt-8 flex flex-wrap justify-center gap-5 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-sm border border-border bg-card" /> Standard ₹
-                  {PRICE.standard}
+                  <span className="h-3 w-3 rounded-sm border border-emerald-500/50 bg-card" /> Available (Standard ₹{PRICE.standard})
                 </span>
                 <span className="inline-flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-sm border border-primary/50 bg-card" /> Recliner
-                  ₹{PRICE.premium}
+                  <span className="h-3 w-3 rounded-sm border border-red-500/50 bg-card" /> Recliner (₹{PRICE.premium})
                 </span>
                 <span className="inline-flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-sm bg-primary" /> Selected ({seats.length})
+                  <span className="h-3 w-3 rounded-sm bg-emerald-500" /> Selected ({seats.length})
                 </span>
                 <span className="inline-flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-sm bg-accent/50" /> Sold
+                  <span className="h-3 w-3 rounded-sm bg-red-950/60 border border-red-500/40" /> Sold Out
                 </span>
               </div>
             </div>

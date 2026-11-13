@@ -64,7 +64,7 @@ export default function StaffScannerDialog({ open, onClose }) {
                 <h2 className="font-display text-xl sm:text-2xl font-bold tracking-wide text-foreground">
                   STAFF GATE SCANNER
                 </h2>
-                <span className="rounded bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-400 border border-amber-500/30">
+                <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-400 border border-emerald-500/30">
                   STAFF ONLY
                 </span>
               </div>
@@ -257,19 +257,19 @@ export default function StaffScannerDialog({ open, onClose }) {
 
               {/* CASE 3: INVALID / NOT FOUND */}
               {!result.valid && result.status !== "CANCELLED" && (
-                <div className="rounded-xl border-2 border-amber-500 bg-amber-950/30 p-5 shadow-lg">
-                  <div className="flex items-center gap-3 text-amber-400">
-                    <AlertTriangle className="h-8 w-8 shrink-0 text-amber-400" />
+                <div className="rounded-xl border-2 border-rose-500 bg-rose-950/30 p-5 shadow-lg">
+                  <div className="flex items-center gap-3 text-rose-400">
+                    <AlertTriangle className="h-8 w-8 shrink-0 text-rose-400" />
                     <div>
-                      <h3 className="font-display text-2xl font-bold tracking-wide text-amber-400">
+                      <h3 className="font-display text-2xl font-bold tracking-wide text-rose-400">
                         ❌ INVALID TICKET CODE
                       </h3>
-                      <p className="text-xs text-amber-300/80">
+                      <p className="text-xs text-rose-300/80">
                         {result.message || "No booking record found for this ticket code."}
                       </p>
                     </div>
                   </div>
-                  <div className="mt-4 rounded-md bg-amber-500/20 p-2.5 text-center text-xs font-bold text-amber-300">
+                  <div className="mt-4 rounded-md bg-rose-500/20 p-2.5 text-center text-xs font-bold text-rose-300">
                     ⚠️ DO NOT ADMIT — PLEASE ASK GUEST FOR VALID PROOF OF BOOKING
                   </div>
                 </div>

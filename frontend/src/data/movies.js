@@ -17,6 +17,7 @@ import ghostSignal from "@/assets/posters/ghost-signal.jpg";
 import avengersEndgame from "@/assets/posters/avengers-endgame.jpg";
 import spiderMan from "@/assets/posters/spider-man.jpg";
 import featuredBanner from "@/assets/featured-banner.jpg";
+import heroAvengersEndgame from "@/assets/hero-avengers-endgame.jpg";
 
 export const GENRES = [
   "All Movies",
@@ -52,17 +53,17 @@ export const CINEMAS = [
 ];
 
 export const FEATURED = {
-  id: "astral-frontier",
-  title: "The Astral Frontier",
-  backdrop: featuredBanner,
-  genres: ["Sci-Fi", "Adventure"],
-  duration: "2h 38m",
-  releaseDate: "Now in IMAX",
+  id: "avengers-endgame",
+  title: "Avengers: Endgame",
+  backdrop: heroAvengersEndgame,
+  genres: ["Action", "Sci-Fi", "Adventure"],
+  duration: "3h 02m",
+  releaseDate: "Now in IMAX 3D",
   year: 2026,
   rating: 8.9,
   age: "UA 13+",
   description:
-    "Stranded on a dying moon beneath a ringed giant, a lone pilot must cross a thousand miles of red desert to bring humanity's last signal home.",
+    "After the devastating events of Infinity War, the universe is in ruins. The Avengers assemble once more to reverse Thanos' actions and restore balance to the universe.",
 };
 
 export const MOVIES = [

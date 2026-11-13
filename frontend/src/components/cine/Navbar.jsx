@@ -32,14 +32,14 @@ const NAV = [
 function UserAvatar({ user, size = "md" }) {
   const [error, setError] = useState(false);
   const initial = user?.name ? user.name.trim().charAt(0).toUpperCase() : "U";
-  
+
   // Unavatar searches Google, Gravatar, and social profiles by email
   const avatarUrl = `https://unavatar.io/${encodeURIComponent(user?.email || "")}?fallback=false`;
   const sizeClasses = size === "lg" ? "h-11 w-11 text-base" : "h-8 w-8 text-xs";
 
   return (
     <div
-      className={`relative flex ${sizeClasses} shrink-0 items-center justify-center rounded-full border-2 border-primary/70 bg-gradient-to-tr from-amber-500 via-primary to-yellow-300 font-extrabold text-black shadow-md overflow-hidden`}
+      className={`relative flex ${sizeClasses} shrink-0 items-center justify-center rounded-full border-2 border-primary/70 bg-gradient-to-tr from-red-600 via-primary to-rose-400 font-extrabold text-white shadow-md overflow-hidden`}
     >
       {!error && user?.email ? (
         <img
@@ -107,7 +107,7 @@ export default function Navbar() {
                 setUser(data.user);
               }
             })
-            .catch(() => {});
+            .catch(() => { });
         }
       } catch {
         setUser(null);
@@ -142,7 +142,7 @@ export default function Navbar() {
           setTicketCount(data.totalBookings || 0);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [user, bookingsOpen]);
 
   // Close profile dropdown on outside click or route change
@@ -202,9 +202,8 @@ export default function Navbar() {
           key={item.key}
           to={item.to}
           hash={item.hash}
-          className={`block rounded-md px-3 py-3 text-base font-semibold transition ${
-            active ? "bg-primary/15 text-primary" : "text-foreground hover:bg-accent"
-          }`}
+          className={`block rounded-md px-3 py-3 text-base font-semibold transition ${active ? "bg-primary/15 text-primary" : "text-foreground hover:bg-accent"
+            }`}
         >
           {item.label}
         </Link>
@@ -224,9 +223,8 @@ export default function Navbar() {
         key={item.key}
         to={item.to}
         hash={item.hash}
-        className={`relative py-2 text-sm font-semibold transition-colors ${colorClass} after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:bg-primary after:transition-all ${
-          active ? "after:w-full" : "after:w-0 hover:after:w-full"
-        }`}
+        className={`relative py-2 text-sm font-semibold transition-colors ${colorClass} after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:bg-primary after:transition-all ${active ? "after:w-full" : "after:w-0 hover:after:w-full"
+          }`}
       >
         {item.label}
       </Link>
@@ -238,13 +236,12 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-          isOverHero
-            ? "border-b border-transparent bg-gradient-to-b from-black/85 via-black/45 to-transparent"
+        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${isOverHero
+            ? "bg-gradient-to-b from-black/85 via-black/45 to-transparent"
             : scrolled || mobileOpen
               ? "border-b border-border bg-nav/95 backdrop-blur-md shadow-md"
               : "border-b border-border/40 bg-transparent backdrop-blur-xs"
-        }`}
+          }`}
       >
         <div className="container-cine flex h-20 items-center justify-between gap-4">
           {/* Logo (Already contains its own Link to="/" inside Logo.jsx) */}
@@ -258,11 +255,10 @@ export default function Navbar() {
           ) : (
             <div className="hidden lg:flex items-center gap-2">
               <span
-                className={`rounded-full px-3 py-1 text-xs font-bold tracking-wider border ${
-                  isAdminRoute
+                className={`rounded-full px-3 py-1 text-xs font-bold tracking-wider border ${isAdminRoute
                     ? "bg-purple-500/15 border-purple-500/30 text-purple-600 dark:text-purple-400"
-                    : "bg-amber-500/15 border-amber-500/30 text-amber-600 dark:text-amber-500"
-                }`}
+                    : "bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                  }`}
               >
                 {isAdminRoute ? "ADMIN CONTROL CENTER" : "STAFF CONTROL CENTER"}
               </span>
@@ -275,13 +271,12 @@ export default function Navbar() {
             <button
               type="button"
               onClick={toggleTheme}
-              className={`hidden h-9 w-9 items-center justify-center rounded-md transition sm:inline-flex ${
-                isOverHero ? "text-white hover:bg-white/10" : "text-foreground hover:bg-accent"
-              }`}
+              className={`hidden h-9 w-9 items-center justify-center rounded-md transition sm:inline-flex ${isOverHero ? "text-white hover:bg-white/10" : "text-foreground hover:bg-accent"
+                }`}
               aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
             >
               {isDark ? (
-                <Sun className="h-4 w-4 text-amber-400" />
+                <Sun className="h-4 w-4 text-emerald-400" />
               ) : (
                 <Moon className="h-4 w-4 text-primary" />
               )}
@@ -291,11 +286,10 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => setLocOpen(true)}
-              className={`hidden items-center gap-1.5 rounded-md px-2.5 py-2 text-sm transition md:flex ${
-                isOverHero
+              className={`hidden items-center gap-1.5 rounded-md px-2.5 py-2 text-sm transition md:flex ${isOverHero
                   ? "text-white/85 hover:text-white"
                   : "text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               <MapPin className="h-4 w-4 text-primary" /> {city}{" "}
               <ChevronDown className="h-3.5 w-3.5" />
@@ -312,17 +306,15 @@ export default function Navbar() {
                       e.stopPropagation();
                       setProfileOpen((prev) => !prev);
                     }}
-                    className={`flex items-center gap-2 rounded-full border border-primary/30 bg-card/85 py-1 pl-1 pr-3 text-xs font-semibold shadow-sm transition hover:border-primary hover:bg-card ${
-                      isOverHero ? "text-white" : "text-foreground"
-                    }`}
+                    className={`flex items-center gap-2 rounded-full border border-primary/30 bg-card/85 py-1 pl-1 pr-3 text-xs font-semibold shadow-sm transition hover:border-primary hover:bg-card ${isOverHero ? "text-white" : "text-foreground"
+                      }`}
                     aria-expanded={profileOpen}
                   >
                     <UserAvatar user={user} size="sm" />
                     <span className="font-bold text-primary">{firstName}</span>
                     <ChevronDown
-                      className={`h-3 w-3 text-muted-foreground transition-transform duration-200 ${
-                        profileOpen ? "rotate-180 text-primary" : ""
-                      }`}
+                      className={`h-3 w-3 text-muted-foreground transition-transform duration-200 ${profileOpen ? "rotate-180 text-primary" : ""
+                        }`}
                     />
                   </button>
 
@@ -378,12 +370,12 @@ export default function Navbar() {
                               setProfileOpen(false);
                               setScannerOpen(true);
                             }}
-                            className="flex w-full items-center justify-between rounded-md px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-amber-500/15 hover:text-amber-400"
+                            className="flex w-full items-center justify-between rounded-md px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-emerald-500/15 hover:text-emerald-400"
                           >
                             <span className="inline-flex items-center gap-2">
-                              <ScanLine className="h-4 w-4 text-amber-400" /> Staff Gate Scanner
+                              <ScanLine className="h-4 w-4 text-emerald-400" /> Staff Gate Scanner
                             </span>
-                            <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold text-amber-400">
+                            <span className="rounded bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold text-emerald-400">
                               SCAN
                             </span>
                           </button>
@@ -410,12 +402,12 @@ export default function Navbar() {
                           <Link
                             to="/staff"
                             onClick={() => setProfileOpen(false)}
-                            className="flex w-full items-center justify-between rounded-md px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-amber-500/15 hover:text-amber-500"
+                            className="flex w-full items-center justify-between rounded-md px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-emerald-500/15 hover:text-emerald-400"
                           >
                             <span className="inline-flex items-center gap-2">
-                              <LayoutDashboard className="h-4 w-4 text-amber-500" /> Staff Operations
+                              <LayoutDashboard className="h-4 w-4 text-emerald-400" /> Staff Operations
                             </span>
-                            <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold text-amber-500">
+                            <span className="rounded bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold text-emerald-400">
                               STAFF
                             </span>
                           </Link>
@@ -444,7 +436,7 @@ export default function Navbar() {
                 ) : !isInternalRoute && user.role === "staff" ? (
                   <Link
                     to="/staff"
-                    className="hidden lg:inline-flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1.5 text-xs font-bold text-amber-500 hover:bg-amber-500 hover:text-black transition shadow-sm"
+                    className="hidden lg:inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-400 hover:bg-emerald-500 hover:text-white transition shadow-sm"
                   >
                     <LayoutDashboard className="h-3.5 w-3.5" /> Staff Dashboard
                   </Link>
@@ -470,9 +462,8 @@ export default function Navbar() {
             ) : (
               <Link
                 to="/login"
-                className={`hidden items-center gap-1.5 rounded-md px-2.5 py-2 text-sm font-semibold transition hover:text-primary lg:flex ${
-                  isOverHero ? "text-white/90" : "text-foreground"
-                }`}
+                className={`hidden items-center gap-1.5 rounded-md px-2.5 py-2 text-sm font-semibold transition hover:text-primary lg:flex ${isOverHero ? "text-white/90" : "text-foreground"
+                  }`}
               >
                 <User className="h-4 w-4 text-primary" /> Login / Sign Up
               </Link>
@@ -489,9 +480,8 @@ export default function Navbar() {
               onClick={() => setMobileOpen((v) => !v)}
               aria-label="Toggle menu"
               aria-expanded={mobileOpen}
-              className={`grid h-10 w-10 place-items-center rounded-md transition lg:hidden ${
-                isOverHero ? "text-white hover:bg-white/10" : "text-foreground hover:bg-accent"
-              }`}
+              className={`grid h-10 w-10 place-items-center rounded-md transition lg:hidden ${isOverHero ? "text-white hover:bg-white/10" : "text-foreground hover:bg-accent"
+                }`}
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -507,11 +497,10 @@ export default function Navbar() {
               ) : (
                 <div className="py-2 space-y-2">
                   <span
-                    className={`inline-block rounded px-2.5 py-1 text-xs font-bold border ${
-                      isAdminRoute
+                    className={`inline-block rounded px-2.5 py-1 text-xs font-bold border ${isAdminRoute
                         ? "bg-purple-500/15 border-purple-500/30 text-purple-600 dark:text-purple-400"
-                        : "bg-amber-500/15 border-amber-500/30 text-amber-500"
-                    }`}
+                        : "bg-emerald-500/15 border-emerald-500/30 text-emerald-400"
+                      }`}
                   >
                     {isAdminRoute ? "ADMIN CONTROL CENTER" : "STAFF CONTROL CENTER"}
                   </span>
@@ -540,7 +529,7 @@ export default function Navbar() {
                 >
                   {isDark ? (
                     <>
-                      <Sun className="h-4 w-4 text-amber-400" /> Light Mode
+                      <Sun className="h-4 w-4 text-emerald-400" /> Light Mode
                     </>
                   ) : (
                     <>
@@ -597,7 +586,7 @@ export default function Navbar() {
                         <Link
                           to="/staff"
                           onClick={() => setMobileOpen(false)}
-                          className="mt-1.5 flex w-full items-center justify-center gap-2 rounded-md border border-amber-500/40 bg-amber-500/20 py-2 text-xs font-bold text-amber-300 transition hover:bg-amber-500 hover:text-black"
+                          className="mt-1.5 flex w-full items-center justify-center gap-2 rounded-md border border-emerald-500/40 bg-emerald-500/20 py-2 text-xs font-bold text-emerald-300 transition hover:bg-emerald-500 hover:text-white"
                         >
                           <LayoutDashboard className="h-3.5 w-3.5" /> Staff Operations
                         </Link>
@@ -607,7 +596,7 @@ export default function Navbar() {
                             setMobileOpen(false);
                             setScannerOpen(true);
                           }}
-                          className="mt-1.5 flex w-full items-center justify-center gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 py-2 text-xs font-semibold text-amber-300 transition hover:bg-amber-500 hover:text-black"
+                          className="mt-1.5 flex w-full items-center justify-center gap-2 rounded-md border border-emerald-500/40 bg-emerald-500/10 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500 hover:text-white"
                         >
                           <ScanLine className="h-3.5 w-3.5" /> Staff Gate Scanner
                         </button>
